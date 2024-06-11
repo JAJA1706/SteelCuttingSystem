@@ -3,7 +3,7 @@
 # ----------------------------------------
 set STOCK;
 param stockWidths {STOCK} > 0;        		# width of raw bars [.dat]
-param stockNum {STOCK} > 0;        			# num of raw bars [.dat]
+#param stockNum {STOCK} > 0;        		# num of raw bars [.dat]
 set ORDERS;                   				# set of widths to be cut [.dat]
 param widths {ORDERS} > 0;					# width of ordered bars [.dat]
 param barsNum {ORDERS} > 0;    				# number of each width to be cut [.dat]

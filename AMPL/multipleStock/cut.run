@@ -48,7 +48,6 @@ let isNewPattern := 0;
 repeat
 {
 	solve Cutting_Opt;
-	display StockLimit;
 	
 	let {i in ORDERS} price[i] := FillOrder[i].dual;
 	solve Pattern_Gen;

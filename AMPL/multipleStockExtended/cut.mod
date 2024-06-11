@@ -17,7 +17,7 @@ param wfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;			# widths for each pat
 								                            		# of bars of width i in pattern j	                            
 var usedPatterns {i in STOCK, PATTERNS[i]} integer >= 0; 		#how many patterns of each type
 				                            
-#param rfep i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;	#relax for each pattern
+param rfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;	#relax for each pattern
 															#only for display purposes
 	
 minimize Cost:
@@ -31,16 +31,15 @@ subj to StockLimit {i in STOCK}:
 # ----------------------------------------
 # KNAPSACK SUBPROBLEM WITH RELAXATION
 # ----------------------------------------
-param relaxCost default 0.00000001;
+param relaxCost default 0.0001;
 param price {ORDERS} default 0.0;
+param rawBarWidth > 0;
 var Use {ORDERS} integer >= 0;
 var Relax {ORDERS} integer >= 0;
-var StockUse {STOCK} integer >= 0;
 	
-minimize ReducedCost:
-	sum {i in STOCK} stockWidths[i] * StockUse[i] - sum{x in ORDERS}(widths[x] * Use[x] + price[x]*Use[x]);
+maximize ReducedCost:
+   sum {i in ORDERS} (price[i] * Use[i] - Relax[i] * relaxCost);
 subj to WidthLimit:
-   sum {x in ORDERS} (widths[x] * Use[x]) <= sum {i in STOCK} stockWidths[i] * StockUse[i];
-subj to oneStock:
-	sum {i in STOCK} StockUse[i] = 1;
-	
+   sum {i in ORDERS} (widths[i] * Use[i] - Relax[i]) <= rawBarWidth;
+subj to RelaxLimit {i in ORDERS}:
+	Relax[i] <= maxRelax[i]*Use[i];

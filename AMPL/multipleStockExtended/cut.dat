@@ -1,13 +1,12 @@
 data;
-param rawBarWidth := 110;
 param: ORDERS: widths  barsNum  maxRelax :=
-	1	20		20		0
-	2	20		38		3
-    3	45		35		0
-    4	50		24		0
-    5	55		10		0
-    6	75		8  		0;
+	1	200		20		0
+	2	200		38		0
+    3	300		35		0
+    4	375		24		0
+    5	450		15		0
+    6	500		10  	0;
 	
 param: STOCK: stockWidths stockNum stockCost :=
-	1	75 50 10
-	2	50 50 10
+	1	1200 100 1
+	2	1000 100 1
