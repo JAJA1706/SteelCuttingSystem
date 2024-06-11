@@ -1,0 +1,57 @@
+option solver cbc;
+option solution_round 6;
+
+model singleStock/cut.mod;
+data singleStock/cut.dat;
+
+problem Cutting_Opt: Cut, Number, Fill;
+   option relax_integrality 1;
+   option presolve 0;
+
+problem Pattern_Gen: Use, Relax, ReducedCost, WidthLimit, RelaxLimit;
+   option relax_integrality 0;
+   option presolve 1;
+
+#let relaxCost := 100; #uncomment to solve without relax
+let nPAT := 0;
+#setting up one pattern for every width
+for {i in ORDERS} 
+{			
+	let nPAT := nPAT + 1;
+	let wfep[i,nPAT] := floor (rawBarWidth/widths[i]);
+	let {i2 in ORDERS: i2 <> i} wfep[i2,nPAT] := 0;
+	let {i2 in ORDERS} rfep[i2,nPAT] := 0;
+};
+
+repeat
+{
+	solve Cutting_Opt;
+	display Cut; #do usuniecia
+	#new price is a cost in raw bars associated with incrementing orders by 1 for every width
+	let {i in ORDERS} price[i] := Fill[i].dual;
+	display price; #do usuniecia
+	solve Pattern_Gen;
+	display Use;
+	display Relax;
+	display ReducedCost;
+	if ReducedCost > 0.00001 then 
+	{
+		let nPAT := nPAT + 1;
+		let {i in ORDERS} wfep[i,nPAT] := Use[i];
+		let {i in ORDERS} rfep[i,nPAT] := Relax[i];
+	}
+	else
+		break;
+};
+
+
+display rfep;
+display wfep;
+display Cut;
+
+option Cutting_Opt.relax_integrality 0;
+option Cutting_Opt.presolve 10;
+solve Cutting_Opt;
+
+display Cut;
+display _total_solve_elapsed_time;

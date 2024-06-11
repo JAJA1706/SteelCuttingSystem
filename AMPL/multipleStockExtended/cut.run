@@ -1,0 +1,89 @@
+option solver cbc;
+option solution_round 6;
+
+model multipleStockExtended/cut.mod;
+data multipleStockExtended/cut.dat;
+
+problem Cutting_Opt: usedPatterns, Cost, FillOrder, StockLimit;
+   option relax_integrality 1;
+   option presolve 0;
+
+problem Pattern_Gen: Use, Relax, StockUse, ReducedCost, WidthLimit, oneStock;
+   option relax_integrality 0;
+   option presolve 1;
+
+#let relaxCost := 100; #uncomment to solve without relax
+
+for {i in STOCK}
+{
+	let nPAT[i] := 0;
+}
+
+param temp;
+for {i in STOCK}
+{
+	for{ x in ORDERS}
+	{
+		let temp := floor(stockWidths[i] / widths[x]);
+		if temp > 0 then
+		{
+			let nPAT[i] := nPAT[i] + 1;
+			let wfep[i,x,nPAT[i]] := temp;
+			let {x2 in ORDERS: x2 <> x} wfep[i,x2,nPAT[i]] := 0;
+		}
+	}
+};
+
+display wfep;
+
+param isNewPattern;
+param prevCreatedPattern {ORDERS};
+
+let {i in ORDERS} prevCreatedPattern[i] := 0;
+let isNewPattern := 0;
+repeat
+{
+	solve Cutting_Opt;
+	display StockLimit;
+	
+	let {i in ORDERS} price[i] := FillOrder[i].dual;
+	solve Pattern_Gen;
+	display Use;
+	display ReducedCost;
+	display StockUse;
+	
+	
+	for{ x in ORDERS }
+	{
+		if prevCreatedPattern[x] != Use[x] then
+		{
+			let isNewPattern := 1;
+		}
+		let prevCreatedPattern[x] := Use[x];
+	}
+	
+	if ReducedCost < -0.00001 && isNewPattern = 1 then 
+	{
+		for{ i in STOCK }
+		{
+			let temp := i;
+			if StockUse[i] = 1 then
+				break;
+		}
+		
+		let nPAT[temp] := nPAT[temp] + 1;
+		let {x in ORDERS} wfep[temp,x,nPAT[temp]] := Use[x];
+		let isNewPattern := 0;
+	}
+	else
+		break;
+};
+
+
+display wfep;
+
+option Cutting_Opt.relax_integrality 0;
+option Cutting_Opt.presolve 1;
+solve Cutting_Opt;
+
+display _total_solve_elapsed_time;
