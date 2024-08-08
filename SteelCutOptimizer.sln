@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteelCutOptimizer.Server", "SteelCutOptimizer.Server\SteelCutOptimizer.Server.csproj", "{6CE57243-A0B9-464F-94EC-0EB71C914AF2}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "steelcutoptimizer.client", "steelcutoptimizer.client\steelcutoptimizer.client.esproj", "{4712AD45-A8E0-433A-9C96-5324345D8638}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CE57243-A0B9-464F-94EC-0EB71C914AF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE57243-A0B9-464F-94EC-0EB71C914AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE57243-A0B9-464F-94EC-0EB71C914AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CE57243-A0B9-464F-94EC-0EB71C914AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4712AD45-A8E0-433A-9C96-5324345D8638}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4712AD45-A8E0-433A-9C96-5324345D8638}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4712AD45-A8E0-433A-9C96-5324345D8638}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4712AD45-A8E0-433A-9C96-5324345D8638}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4712AD45-A8E0-433A-9C96-5324345D8638}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4712AD45-A8E0-433A-9C96-5324345D8638}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FFA86BF3-D81B-4F6D-A19D-D2DA01658D3E}
+	EndGlobalSection
+EndGlobal

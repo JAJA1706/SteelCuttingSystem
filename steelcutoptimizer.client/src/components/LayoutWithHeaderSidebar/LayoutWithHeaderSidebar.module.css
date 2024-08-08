@@ -1,0 +1,15 @@
+.mainBody{
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+    flex-wrap: wrap;
+}
+
+.button {
+    color: black;
+    font-size: medium;
+}
+
+.button:hover{
+    background: white; 
+}
