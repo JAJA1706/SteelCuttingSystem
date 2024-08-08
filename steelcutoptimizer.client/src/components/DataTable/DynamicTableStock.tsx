@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, MutableRefObject } from 'react';
 import {
     MantineReactTable,
     createRow,
@@ -13,14 +13,18 @@ import { IconTrash } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
 import classes from "./DynamicTableStock.module.css"
 
-interface Stock {
+export interface Stock {
     id: string;
     length: number;
     count: number;
     cost: number;
 }
 
-const DynamicTableStock = () => {
+interface DynamicTableStockProps {
+    dataRef: MutableRefObject<Stock[]>,
+}
+
+const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
     const [validationErrors, setValidationErrors] = useState<
         Record<string, string | undefined>
     >({});
@@ -31,6 +35,10 @@ const DynamicTableStock = () => {
     const [isFetchingUsers, setIsFetchingUsers] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
+    useEffect(() => {
+        if (dataRef !== undefined)
+            dataRef.current = data;
+    }, [data, dataRef])
 
     //DELETE action
     const openDeleteConfirmModal = () =>
@@ -70,6 +78,9 @@ const DynamicTableStock = () => {
                     type: 'number',
                     required: true,
                     error: validationErrors?.[cell.id],
+                    onFocus: (event) => {
+                        event.target.select();
+                    },
                     onBlur: (event) => {
                         const value = event.currentTarget.value;
                         const validationError = !validatePositiveNumber(value)
@@ -96,6 +107,9 @@ const DynamicTableStock = () => {
                     type: 'number',
                     required: true,
                     error: validationErrors?.[cell.id],
+                    onFocus: (event) => {
+                        event.target.select();
+                    },
                     onBlur: (event) => {
                         const value = event.currentTarget.value;
                         const validationError = !validatePositiveNumber(value)
@@ -121,6 +135,9 @@ const DynamicTableStock = () => {
                     type: 'number',
                     required: true,
                     error: validationErrors?.[cell.id],
+                    onFocus: (event) => {
+                        event.target.select();
+                    },
                     onBlur: (event) => {
                         const value = event.currentTarget.value;
                         const validationError = !validatePositiveNumber(value)
@@ -150,7 +167,6 @@ const DynamicTableStock = () => {
         enableEditing: true,
         positionActionsColumn: 'last',
         getRowId: (row) => row.id,
-        onCreatingRowCancel: () => setValidationErrors({}),
         enableRowSelection: true,
         enableTopToolbar: false,
         mantineTableBodyRowProps: {

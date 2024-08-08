@@ -1,0 +1,30 @@
+.layout{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mainBody {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    /*min-width: 1500px;*/
+}
+
+.upperBody {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+}
+
+.dynTables {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.table {
+    margin: 15px 15px 15px 15px;
+}

@@ -1,8 +1,8 @@
 option solver cbc;
 option solution_round 6;
 
-model singleStock/cut.mod;
-data singleStock/cut.dat;
+#model singleStock/cut.mod;
+#data singleStock/cut.dat;
 
 problem Cutting_Opt: Cut, Number, Fill;
    option relax_integrality 1;

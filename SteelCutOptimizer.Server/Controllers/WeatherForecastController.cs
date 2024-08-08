@@ -1,3 +1,5 @@
+using ampl;
+using ampl.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SteelCutOptimizer.Server.Controllers
@@ -21,13 +23,21 @@ namespace SteelCutOptimizer.Server.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            String modelDirectory = "C:\\Programowanie\\Source\\Magisterka\\AMPL\\singleStock";
+
+            using (AMPL a = new AMPL())
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                // Interpret files
+                a.Read(System.IO.Path.Combine(modelDirectory, "cut.mod"));
+                a.ReadData(System.IO.Path.Combine(modelDirectory, "cut.dat"));
+                a.Read(System.IO.Path.Combine(modelDirectory, "cut.run"));
+
+                Objective totalcost = a.GetObjective("Number");
+                Variable lol = a.GetVariable("Cut");
+                Console.WriteLine(totalcost.Value);
+            }
+
+            return new List<WeatherForecast>();
         }
     }
 }
