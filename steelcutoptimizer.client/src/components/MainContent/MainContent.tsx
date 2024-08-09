@@ -4,6 +4,7 @@ import DynamicTableStock, { Stock } from "../DataTable/DynamicTableStock"
 import DynamicTableOrder, { Order } from "../DataTable/DynamicTableOrder"
 import ResultTable from "../ResultTable/ResultTable"
 import classes from "./MainContent.module.css"
+import useSolveCuttingStockProblem from "../../hooks/useSolveCuttingStockProblem"
 
 const MainContent = () => {
     const resultData = [
@@ -42,9 +43,15 @@ const MainContent = () => {
     const stockDataRef = useRef<Stock[]>([]);
     const orderDataRef = useRef<Order[]>([]);
 
+    const solveCuttingStockMutation = useSolveCuttingStockProblem();
+
     const onGenerateResultClick = () => {
-        console.log(stockDataRef.current.length);
-        console.log(orderDataRef.current.length);
+        const requestBody = {
+            problemType: "MultipleStock",
+            stockList: [...stockDataRef.current],
+            orderList: [...orderDataRef.current],
+        };
+        solveCuttingStockMutation.mutate(requestBody);
     }
 
     return (

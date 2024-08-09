@@ -4,6 +4,7 @@ import '@mantine/dates/styles.css'; //if using mantine date picker features
 import 'mantine-react-table/styles.css'; //make sure MRT styles were imported in your app root (once)
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LayoutWithHeaderSidebar from "./components/LayoutWithHeaderSidebar/LayoutWithHeaderSidebar"
 //import classes from './App.module.css';
 
@@ -49,17 +50,20 @@ function App() {
     //            )}
     //        </tbody>
     //    </table>;
+    const queryClient = new QueryClient();
 
     return (
         <MantineProvider >
             <ModalsProvider>
+                <QueryClientProvider client={queryClient}>
             {/*<div>*/}
             {/*    <h1 id="tabelLabel">Weather forecast</h1>*/}
             {/*    <p>This component demonstrates fetching data from the server.</p>*/}
             {/*    {contents}*/}
             {/*    <Button>hehe</Button>*/}
             {/*</div>*/}
-                <LayoutWithHeaderSidebar />
+                    <LayoutWithHeaderSidebar />
+                </QueryClientProvider>
             </ModalsProvider>
         </MantineProvider>
     );

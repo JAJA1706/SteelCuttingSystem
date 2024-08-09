@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(ProjectDir)lib\* $(ProjectDir)$(OutDir)&#xD;&#xA;copy $(ProjectDir)lib\dotnet\ampl-dotnet-native.dll $(ProjectDir)$(OutDir)" />
+    <Exec Command="xcopy $(ProjectDir)lib\* $(ProjectDir)$(OutDir) /D /y&#xD;&#xA;xcopy $(ProjectDir)lib\dotnet\ampl-dotnet-native.dll $(ProjectDir)$(OutDir) /D /y&#xD;&#xA;xcopy $(ProjectDir)..\AMPL\* $(ProjectDir)$(OutDir)AmplModels\ /E /I /D /y" />
   </Target>
 
 </Project>

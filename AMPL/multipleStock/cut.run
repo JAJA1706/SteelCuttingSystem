@@ -1,8 +1,8 @@
 option solver cplex;
 option solution_round 6;
 
-model multipleStock/cut.mod;
-data multipleStock/cut.dat;
+#model multipleStock/cut.mod;
+#data multipleStock/cut.dat;
 
 problem Cutting_Opt: usedPatterns, Waste, FillOrder;
    option relax_integrality 1;

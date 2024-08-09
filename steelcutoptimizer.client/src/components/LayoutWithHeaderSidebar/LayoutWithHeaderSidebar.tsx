@@ -17,15 +17,15 @@ export default function LayoutWithHeaderSidebar() {
                     <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" h="100%" px="md"/>
                 <Group h="100%" ml="xl" gap={10} visibleFrom="sm" justify="flex-end" mr={10}>
                     <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button}>New Plan</Button>
-                    <Button variant="subtle" leftSection={<IconUpload />} className={classes.button}>Import Plan</Button>
-                    <Button variant="subtle" leftSection={<IconDownload />} className={classes.button}>Download Plan</Button>
+                    <Button variant="subtle" leftSection={<IconDownload />} className={classes.button}>Import Plan</Button>
+                    <Button variant="subtle" leftSection={<IconUpload />} className={classes.button}>Download Plan</Button>
                 </Group>
             </AppShell.Header>
 
             <AppShell.Navbar py="md" px={4}>
                 <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button}>New Plan</Button>
-                <Button variant="subtle" leftSection={<IconUpload />} className={classes.button}>Import Plan</Button>
-                <Button variant="subtle" leftSection={<IconDownload />} className={classes.button}>Download Plan</Button>
+                <Button variant="subtle" leftSection={<IconDownload />} className={classes.button}>Import Plan</Button>
+                <Button variant="subtle" leftSection={<IconUpload />} className={classes.button}>Download Plan</Button>
             </AppShell.Navbar>
 
             <AppShell.Main>
