@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Button, Paper, Divider } from '@mantine/core'
 import DynamicTableStock, { Stock } from "../DataTable/DynamicTableStock"
 import DynamicTableOrder, { Order } from "../DataTable/DynamicTableOrder"
@@ -6,40 +6,11 @@ import ResultTable from "../ResultTable/ResultTable"
 import classes from "./MainContent.module.css"
 import useSolveCuttingStockProblem from "../../hooks/useSolveCuttingStockProblem"
 
-const MainContent = () => {
-    const resultData = [
-        {
-            id: '1',
-            patternNum: 1,
-            count: 1,
-            usedBars: [1]
-        },
-        {
-            id: '2',
-            patternNum: 2,
-            count: 2,
-            usedBars: [1]
-        },
-        {
-            id: '3',
-            patternNum: 3,
-            count: 3,
-            usedBars: [1, 2, 3, 4, 5 ,6 ,7 ,8, 9, 10, 11, 12]
-        },
-        {
-            id: '4',
-            patternNum: 4,
-            count: 4,
-            usedBars: [1, 2]
-        },
-        {
-            id: '5',
-            patternNum: 5,
-            count: 5,
-            usedBars: [1, 2]
-        }
-    ]
+interface MainContentProps {
+    setResetFunction: (resetFunction: () => void) => void,
+}
 
+const MainContent = ({ setResetFunction }: MainContentProps) => {
     const stockDataRef = useRef<Stock[]>([]);
     const orderDataRef = useRef<Order[]>([]);
 
@@ -53,6 +24,14 @@ const MainContent = () => {
         };
         solveCuttingStockMutation.mutate(requestBody);
     }
+
+    const onHandleReset = () => {
+        console.log("reset");
+    }
+
+    useEffect(() => {
+        setResetFunction(onHandleReset);
+    }, [setResetFunction])
 
     return (
         <div className={classes.layout}>
@@ -74,7 +53,7 @@ const MainContent = () => {
                 <Paper className={classes.resultTable} shadow="md" withBorder>
                     <div>
                         <ResultTable
-                            data={resultData}
+                            data={solveCuttingStockMutation.data?.resultItems ?? []}
                         />
                     </div>
                 </Paper>

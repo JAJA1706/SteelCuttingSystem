@@ -1,5 +1,5 @@
 data;
-param: ORDERS: widths  barsNum  maxRelax :=
+param: ORDERS: orderLengths  orderNum  maxRelax :=
 	1	200		20		0
 	2	200		38		0
     3	300		35		0
@@ -7,6 +7,6 @@ param: ORDERS: widths  barsNum  maxRelax :=
     5	450		15		0
     6	500		10  	0;
 	
-param: STOCK: stockWidths stockNum stockCost :=
+param: STOCK: stockLengths stockNum stockCost :=
 	1	1200 100 1
 	2	1000 100 1

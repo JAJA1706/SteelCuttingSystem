@@ -17,7 +17,7 @@ export interface Order {
     id: string;
     length: number;
     count: number;
-    maxRelax: number;
+    maxRelax: number | undefined;
 }
 
 interface DynamicTableOrderProps {
@@ -141,6 +141,9 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
                     },
                     onBlur: (event) => {
                         const value = event.currentTarget.value;
+                        if (value === '')
+                            return;
+
                         const validationError = !validatePositiveNumber(value)
                             ? 'Positive number required'
                             : undefined;
@@ -180,9 +183,9 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
                         setData((oldData) => {
                             return [...oldData, {
                                 id: uuidv4(),
-                                length: 0,
-                                count: 0,
-                                maxRelax: 0,
+                                length: 1,
+                                count: 1,
+                                maxRelax: undefined,
                             }]
                         });
                     }}

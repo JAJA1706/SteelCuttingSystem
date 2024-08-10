@@ -8,7 +8,7 @@ problem Cutting_Opt: usedPatterns, Cost, FillOrder, StockLimit;
    option relax_integrality 1;
    option presolve 0;
 
-problem Pattern_Gen: Use, Relax, ReducedCost, WidthLimit, RelaxLimit;
+problem Pattern_Gen: Use, Relax, ReducedCost, LengthLimit, RelaxLimit;
    option relax_integrality 0;
    option presolve 1;
 
@@ -24,12 +24,12 @@ for {i in STOCK}
 {
 	for{ x in ORDERS}
 	{
-		let temp := floor(stockWidths[i] / widths[x]);
+		let temp := floor(stockLengths[i] / orderLengths[x]);
 		if temp > 0 then
 		{
 			let nPAT[i] := nPAT[i] + 1;
-			let wfep[i,x,nPAT[i]] := temp;
-			let {x2 in ORDERS: x2 <> x} wfep[i,x2,nPAT[i]] := 0;
+			let lfep[i,x,nPAT[i]] := temp;
+			let {x2 in ORDERS: x2 <> x} lfep[i,x2,nPAT[i]] := 0;
 			let {x2 in ORDERS} rfep[i,x2,nPAT[i]] := 0;
 		}
 	}
@@ -44,12 +44,12 @@ repeat
 	let {x in ORDERS} price[x] := FillOrder[x].dual;
 	for {i in STOCK}
 	{
-		let rawBarWidth := stockWidths[i];
+		let rawBarLength := stockLengths[i];
 		solve Pattern_Gen;
 		if ReducedCost > 0.0001 + stockCost[i] - StockLimit[i] then
 		{
 			let nPAT[i] := nPAT[i] + 1;
-			let {x in ORDERS} wfep[i,x,nPAT[i]] := Use[x];
+			let {x in ORDERS} lfep[i,x,nPAT[i]] := Use[x];
 			let {x in ORDERS} rfep[i,x,nPAT[i]] := Relax[x];
 			let isNewPattern := 1;
 		}
@@ -63,10 +63,10 @@ repeat
 	let isNewPattern := 0;
 };
 
-display wfep;
+#display lfep;
 
 option Cutting_Opt.relax_integrality 0;
 option Cutting_Opt.presolve 1;
 solve Cutting_Opt;
 
-display _total_solve_elapsed_time;
+#display _total_solve_elapsed_time;

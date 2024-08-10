@@ -6,15 +6,10 @@ import {
 } from 'mantine-react-table';
 import classes from "./ResultTable.module.css"
 
-interface UsedBars {
-    length: number,
-
-}
 interface Pattern {
-    id: string;
-    patternNum: number;
+    patternId: number;
     count: number;
-    usedBars: number[], 
+    usedOrderLengths: number[], 
 }
 
 interface TableProps {
@@ -31,48 +26,42 @@ const ResultTable = ({ data }: TableProps) => {
         () => {
             const result = [
                 {
-                    accessorKey: 'patternNum',
-                    header: 'PatternNum',
-                    size: 80,
+                    accessorKey: 'patternId',
+                    header: 'Pattern ID',
+                    size: 130,
+                },
+                {
+                    accessorKey: 'stockLength',
+                    header: 'Stock Length',
+                    size: 165,
                 },
                 {
                     accessorKey: 'count',
                     header: 'Count',
-                    size: 80,
+                    size: 120,
                 },
-                //{
-                //    id: 'what',
-                //    accessorFn: (row: Pattern) => {
-                //        if (row.usedBars?.length > 0)
-                //            return `${row.usedBars[0]}`
-                //        else
-                //            return '';
-                //    },
-                //    header: '',
-                //    size: 80,
-                //},
             ];
 
-            if (data.length === 0)
+            if (!data || data.length === 0)
                 return result;
 
             let idxOfDataWithMostBars = 0;
             let maxBarNum = 0;
             for (let i = 0; i < data.length; ++i) {
-                if (data[i].usedBars.length > maxBarNum) {
-                    maxBarNum = data[i].usedBars.length;
+                if (data[i].usedOrderLengths.length > maxBarNum) {
+                    maxBarNum = data[i].usedOrderLengths.length;
                     idxOfDataWithMostBars = i;
                 }
             }
 
             let tempIdx = 0;
-            data[idxOfDataWithMostBars].usedBars.forEach(o => {
+            data[idxOfDataWithMostBars].usedOrderLengths.forEach(o => {
                 const idx = tempIdx;
                 result.push({
                     id: idx.toString(),
                     accessorFn: (row: Pattern) => {
-                        if (row.usedBars.length > idx)
-                            return `${row.usedBars[idx]}`
+                        if (row.usedOrderLengths.length > idx)
+                            return `${row.usedOrderLengths[idx]}`
                         else
                             return '';
                     },
@@ -94,13 +83,14 @@ const ResultTable = ({ data }: TableProps) => {
         data: data,
         createDisplayMode: 'row',
         editDisplayMode: 'table',
+        enableColumnResizing: true,
         enableEditing: false,
         enableHiding: false,
         positionActionsColumn: 'last',
         mantineTableProps: {
             withColumnBorders: true,
         },
-        getRowId: (row) => row.id,
+        getRowId: (row) => row.patternId.toString(),
 
         mantineTableBodyRowProps: {
             className: classes.rows

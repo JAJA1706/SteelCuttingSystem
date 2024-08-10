@@ -3,9 +3,19 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconRefresh, IconUpload, IconDownload } from '@tabler/icons-react';
 import MainContent from "../MainContent/MainContent"
 import classes from "./LayoutWithHeaderSidebar.module.css"
+import { useRef } from 'react';
 
 export default function LayoutWithHeaderSidebar() {
     const [opened, { toggle }] = useDisclosure();
+
+    const onNewPlanClick = () => {
+        if (resetRef.current !== undefined)
+            resetRef.current();
+    };
+    const resetRef = useRef<() => void>();
+    const setResetRef = (resetFunction: () => void) => {
+        resetRef.current = resetFunction;
+    }
 
     return (
         <AppShell
@@ -16,7 +26,7 @@ export default function LayoutWithHeaderSidebar() {
             <AppShell.Header bg='blue.1'>
                     <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" h="100%" px="md"/>
                 <Group h="100%" ml="xl" gap={10} visibleFrom="sm" justify="flex-end" mr={10}>
-                    <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button}>New Plan</Button>
+                    <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button} onClick={onNewPlanClick}>New Plan</Button>
                     <Button variant="subtle" leftSection={<IconDownload />} className={classes.button}>Import Plan</Button>
                     <Button variant="subtle" leftSection={<IconUpload />} className={classes.button}>Download Plan</Button>
                 </Group>
@@ -29,7 +39,7 @@ export default function LayoutWithHeaderSidebar() {
             </AppShell.Navbar>
 
             <AppShell.Main>
-                <MainContent/>
+                <MainContent setResetFunction={setResetRef} />
             </AppShell.Main>
         </AppShell>
     );

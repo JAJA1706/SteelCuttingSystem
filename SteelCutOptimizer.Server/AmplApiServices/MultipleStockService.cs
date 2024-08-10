@@ -16,32 +16,49 @@ namespace SteelCutOptimizer.Server.AmplApiServices
                 a.Read(Path.Combine(modelPath, "cut.run"));
 
                 Objective totalcost = a.GetObjective("Cost");
-                Parameter wfep = a.GetParameter("wfep");
-                Variable lol = a.GetVariable("usedPatterns");
+                Parameter lengthForEachPattern = a.GetParameter("lfep");
+                Parameter stockLengths = a.GetParameter("stockLengths");
+                Parameter orderLengths = a.GetParameter("orderLengths");
+                Variable usedPatterns = a.GetVariable("usedPatterns");
 
-                var what = totalcost.Value;
-                var ehh = wfep.GetValues();
-                List<double> jebsie = new List<double>();
-                foreach (var item in ehh)
+                var lfepDataFrame = lengthForEachPattern.GetValues(); //[0] = stockIdx, [1] = orderIdx, [2] = patternPartialIdx, value = Table[stockIdx, orderIdx, patternPartialIdx, usedOrderItemsCount]
+                var usedPatternDataFrame = usedPatterns.GetValues(); //[0] - stockIdx, [1] - patternPartialIdx, value = Table[stockIdx, patternPartialIdx, patternCount]
+                var result = new AmplResult();
+                foreach (var item in lfepDataFrame)
                 {
-                    var bruh = item[3];
-                    if (bruh.Dbl != 0)
+                    //item[0] = stockIdx, item[1] = orderIdx, item[2] = patternPartialIdx, item[3] = usedOrderItemsCount
+                    int usedOrderItemsCount = (int)item[3].Dbl; 
+                    if (usedOrderItemsCount != 0)
                     {
-                        //Console.WriteLine(bruh.Dbl);
-                        jebsie.Add(bruh.Dbl);
+                        int stockIdx = (int)item[0].Dbl;
+                        int orderIdx = (int)item[1].Dbl;
+                        int patternPartialIdx = (int)item[2].Dbl;
+                        int usedOrderLength = (int)orderLengths[orderIdx].Dbl;
+
+                        Tuple<int, int> patternIdx = new(stockIdx, patternPartialIdx);
+                        if(result.Patterns.ContainsKey(patternIdx))
+                        {
+                            for(int i = 0; i < usedOrderItemsCount; ++i)
+                                result.Patterns[patternIdx].UsedOrderLengths.Add(usedOrderLength);
+                        }
+                        else
+                        {
+                            int usedPatternCount = (int)usedPatternDataFrame[stockIdx, patternPartialIdx][2].Dbl;
+                            int stockLength = (int)stockLengths[stockIdx].Dbl;
+
+                            List<int> usedOrderLengths = new List<int>();
+                            for (int i = 0; i < usedOrderItemsCount; ++i)
+                                usedOrderLengths.Add(usedOrderLength);
+
+                            Pattern pattern = new Pattern(stockLength, usedPatternCount, usedOrderLengths);
+                            result.Patterns.Add(patternIdx, pattern);
+                        }
                     }
                 }
-                foreach (var item in lol)
-                {
-                    var bruh = item.Name;
-                    Console.WriteLine(bruh);
-                    var bruh2 = item.Value;
-                    Console.WriteLine(bruh2);
-                }
 
+                result.TotalCost = (int)totalcost.Value;
+                return result;
             }
-
-            return new AmplResult();
         }
     }
 }

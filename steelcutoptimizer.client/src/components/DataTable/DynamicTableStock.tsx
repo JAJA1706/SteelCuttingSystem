@@ -15,9 +15,9 @@ import classes from "./DynamicTableStock.module.css"
 
 export interface Stock {
     id: string;
-    length: number;
-    count: number;
-    cost: number;
+    length: number | undefined;
+    count: number | undefined;
+    cost: number | undefined;
 }
 
 interface DynamicTableStockProps {
@@ -112,6 +112,9 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
                     },
                     onBlur: (event) => {
                         const value = event.currentTarget.value;
+                        if (value === '')
+                            return;
+
                         const validationError = !validatePositiveNumber(value)
                             ? 'Positive number required'
                             : undefined;
@@ -140,6 +143,9 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
                     },
                     onBlur: (event) => {
                         const value = event.currentTarget.value;
+                        if (value === '')
+                            return;
+
                         const validationError = !validatePositiveNumber(value)
                             ? 'Positive number required'
                             : undefined;
@@ -179,9 +185,9 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
                         setData((oldData) => {
                             return [...oldData, {
                                 id: uuidv4(),
-                                length: 0,
-                                count: 0,
-                                cost: 0,
+                                length: 1,
+                                count: undefined,
+                                cost: undefined,
                             }]
                         });
                     }}

@@ -21,7 +21,7 @@
                 if (_clients.ContainsKey(clientIP))
                 {
                     var lastRequestTime = _clients[clientIP];
-                    if ((currentTime - lastRequestTime).TotalSeconds < 1) // 1 request per second limit
+                    if ((currentTime - lastRequestTime).TotalSeconds < 1)
                     {
                         context.Response.StatusCode = 429; // Too Many Requests
                         return;

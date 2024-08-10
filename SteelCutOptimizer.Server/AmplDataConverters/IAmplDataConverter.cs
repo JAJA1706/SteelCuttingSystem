@@ -5,7 +5,9 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
 {
     public interface IAmplDataConverter
     {
+        void AdjustEntryData(CuttingStockProblemDataDTO data);
         void ConvertToAmplDataFile(string dataFilePath, CuttingStockProblemDataDTO data);
-        CuttingStockResultsDTO ConvertResultDataToDTO(AmplResult result);
+        void ValidateResultData(AmplResult amplResult, CuttingStockProblemDataDTO entryData);
+        CuttingStockResultsDTO ConvertResultDataToDTO(AmplResult amplResult);
     }
 }

@@ -3,6 +3,7 @@ using SteelCutOptimizer.Server.AmplApiServices;
 using SteelCutOptimizer.Server.AmplDataConverters;
 using SteelCutOptimizer.Server.DTO;
 using SteelCutOptimizer.Server.Enums;
+using System.Text.Json;
 
 namespace SteelCutOptimizer.Server.Controllers
 {
@@ -34,22 +35,27 @@ namespace SteelCutOptimizer.Server.Controllers
             }
 
             var amplDataConverter = _amplDataConverterFactory.Create(problemType);
-
             try
             {
-                //Creating data file which will be suplied to solver
+                amplDataConverter.AdjustEntryData(problemData);
                 amplDataConverter.ConvertToAmplDataFile(tempDirectory, problemData);
-            } 
+
+                var amplApiService = _amplApiServiceFactory.Create(problemType);
+                AmplResult results = amplApiService.SolveCuttingStockProblem(tempDirectory);
+
+                amplDataConverter.ValidateResultData(results, problemData);
+                var dto = amplDataConverter.ConvertResultDataToDTO(results);
+
+                return Ok(dto);
+            }
+            catch (AMPLException exc)
+            {
+                return BadRequest(exc.Message);
+            }
             catch (InvalidDataException exc)
             {
                 return BadRequest(exc.Message);
             }
-
-            var amplApiService = _amplApiServiceFactory.Create(problemType);
-            var results = amplApiService.SolveCuttingStockProblem(tempDirectory);
-            var dto = amplDataConverter.ConvertResultDataToDTO(results);
-
-            return Ok(dto);
         }
     }
 }
