@@ -1,6 +1,12 @@
 module.exports = {
   root: true,
   env: { browser: true, es2020: true },
+  //parserOptions: {
+  //    ecmaVersion: 'ES2020',
+  //    sourceType: 'module',
+  //    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
+  //    //tsconfigRootDir: "./",
+  //},
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',

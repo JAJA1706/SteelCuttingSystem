@@ -28,10 +28,10 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
     >({});
 
     const [data, setData] = useState<Order[]>([]);
-    const [isLoadingUsers, setIsLoadingUsers] = useState<boolean>(false);
-    const [isLoadingUsersError, setIsLoadingUsersError] = useState<boolean>(false);
-    const [isFetchingUsers, setIsFetchingUsers] = useState<boolean>(false);
-    const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [isLoadingUsers] = useState<boolean>(false);
+    const [isLoadingUsersError] = useState<boolean>(false);
+    const [isFetchingUsers] = useState<boolean>(false);
+    const [isSaving] = useState<boolean>(false);
 
     const setResetOrderDataFunction = useResetStore(state => state.setResetOrderDataFunction);
 

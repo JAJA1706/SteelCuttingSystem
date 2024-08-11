@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Button, Paper, Divider } from '@mantine/core'
 import DynamicTableStock, { Stock } from "../DataTable/DynamicTableStock"
 import DynamicTableOrder, { Order } from "../DataTable/DynamicTableOrder"

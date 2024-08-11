@@ -8,7 +8,7 @@ interface CuttingStockProblemBody {
     orderList: Order[],
 }
 const postCuttingStockProblem = (body: CuttingStockProblemBody) => {
-    return fetch('https://localhost:7040/CuttingStock', {
+    return fetch(import.meta.env.VITE_BACKEND_API_URL,{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
