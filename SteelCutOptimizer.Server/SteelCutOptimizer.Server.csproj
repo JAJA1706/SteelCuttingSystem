@@ -29,7 +29,7 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="xcopy $(ProjectDir)lib\* $(ProjectDir)$(OutDir) /D /y&#xD;&#xA;xcopy $(ProjectDir)lib\dotnet\ampl-dotnet-native.dll $(ProjectDir)$(OutDir) /D /y&#xD;&#xA;xcopy $(ProjectDir)..\AMPL\* $(ProjectDir)$(OutDir)AmplModels\ /E /I /D /y" />
   </Target>
 

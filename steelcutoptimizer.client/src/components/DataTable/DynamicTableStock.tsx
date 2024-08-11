@@ -10,6 +10,8 @@ import { IconTrash } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
 import classes from "./DynamicTableStock.module.css"
 import useResetStore from "../../hooks/useResetStore"
+import useStockStore from "../../hooks/useStockStore"
+import { useShallow } from 'zustand/react/shallow';
 
 export interface Stock {
     id: string;
@@ -34,14 +36,25 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
     const [isSaving] = useState<boolean>(false);
 
     const setResetStockDataFunction = useResetStore(state => state.setResetStockDataFunction);
+    const setStockDataFunctions = useStockStore(useShallow((state) => ({ get: state.setGetStockDataFunction, set: state.setSetStockDataFunction })));
+
+    const setStockData = useCallback((newData: Stock[]) => {
+        setData(newData);
+    }, [setData])
+
+    const getStockData = useCallback((): Stock[] => {
+        return data;
+    }, [data])
 
     const onHandleReset = useCallback(() => {
         setData([]);
     }, [setData])
 
     useEffect(() => {
+        setStockDataFunctions.get(getStockData);
+        setStockDataFunctions.set(setStockData);
         setResetStockDataFunction(onHandleReset);
-    }, [setResetStockDataFunction, onHandleReset])
+    }, [setResetStockDataFunction, onHandleReset, setStockDataFunctions, getStockData, setStockData])
 
     useEffect(() => {
         if (dataRef !== undefined)

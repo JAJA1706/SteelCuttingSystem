@@ -1,0 +1,9 @@
+
+.buttonLayout {
+    display: flex;
+    justify-content: center;
+}
+
+.button {
+    margin: 10px 3px 0px 3px;
+}

@@ -10,6 +10,8 @@ import { IconTrash } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
 import classes from "./DynamicTableOrder.module.css"
 import useResetStore from "../../hooks/useResetStore"
+import useOrderStore from "../../hooks/useOrderStore"
+import { useShallow } from 'zustand/react/shallow';
 
 export interface Order {
     id: string;
@@ -34,14 +36,25 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
     const [isSaving] = useState<boolean>(false);
 
     const setResetOrderDataFunction = useResetStore(state => state.setResetOrderDataFunction);
+    const setOrderDataFunctions = useOrderStore(useShallow((state) => ({ get: state.setGetOrderDataFunction, set: state.setSetOrderDataFunction })));
+
+    const setOrderData = useCallback((newData: Order[]) => {
+        setData(newData);
+    }, [setData])
+
+    const getOrderData = useCallback((): Order[] => {
+        return data;
+    }, [data])
 
     const onHandleReset = useCallback(() => {
         setData([]);
     }, [setData])
 
     useEffect(() => {
+        setOrderDataFunctions.get(getOrderData);
+        setOrderDataFunctions.set(setOrderData);
         setResetOrderDataFunction(onHandleReset);
-    }, [setResetOrderDataFunction, onHandleReset])
+    }, [setResetOrderDataFunction, onHandleReset, setOrderDataFunctions, getOrderData, setOrderData])
 
     useEffect(() => {
         if (dataRef !== undefined)
