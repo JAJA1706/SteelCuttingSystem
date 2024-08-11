@@ -1,5 +1,6 @@
 ﻿using SteelCutOptimizer.Server.AmplApiServices;
 using SteelCutOptimizer.Server.DTO;
+using SteelCutOptimizer.Server.Structs;
 
 namespace SteelCutOptimizer.Server.AmplDataConverters
 {

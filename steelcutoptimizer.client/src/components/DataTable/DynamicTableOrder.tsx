@@ -1,10 +1,7 @@
-import { useMemo, useState, useEffect, MutableRefObject } from 'react';
+import { useMemo, useState, useEffect, MutableRefObject, useCallback } from 'react';
 import {
     MantineReactTable,
-    createRow,
     type MRT_ColumnDef,
-    type MRT_Row,
-    type MRT_TableOptions,
     useMantineReactTable,
 } from 'mantine-react-table';
 import { ActionIcon, Button, Text, Tooltip } from '@mantine/core';
@@ -12,6 +9,7 @@ import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
 import classes from "./DynamicTableOrder.module.css"
+import useResetStore from "../../hooks/useResetStore"
 
 export interface Order {
     id: string;
@@ -35,12 +33,21 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
     const [isFetchingUsers, setIsFetchingUsers] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
+    const setResetOrderDataFunction = useResetStore(state => state.setResetOrderDataFunction);
+
+    const onHandleReset = useCallback(() => {
+        setData([]);
+    }, [setData])
+
+    useEffect(() => {
+        setResetOrderDataFunction(onHandleReset);
+    }, [setResetOrderDataFunction, onHandleReset])
+
     useEffect(() => {
         if (dataRef !== undefined)
             dataRef.current = data;
     }, [data, dataRef])
 
-    //DELETE action
     const openDeleteConfirmModal = () =>
         modals.openConfirmModal({
             centered: true,
@@ -60,7 +67,6 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
         const rowsToDelete: string[] = [];
         Object.entries(selectedRows).forEach(([key, value]) => {
             if (value) {
-                // Assuming you have a function deleteRow that takes a row ID
                 rowsToDelete.push(key);
             }
         });
@@ -163,6 +169,13 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
         [validationErrors],
     );
 
+    const isRemoveButtonDisabled = (): boolean => {
+        const selectedRows = table.getState().rowSelection;
+        if (Object.keys(selectedRows).length === 0)
+            return true
+        return false;
+    }
+
     const table = useMantineReactTable({
         columns,
         data: data,
@@ -193,7 +206,7 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
                     Add new
                 </Button>
                 <Tooltip label="Delete">
-                    <ActionIcon ml='xs' color="red" onClick={() => openDeleteConfirmModal()}>
+                    <ActionIcon ml='xs' color="red" onClick={() => openDeleteConfirmModal()} disabled={isRemoveButtonDisabled()}>
                         <IconTrash />
                     </ActionIcon>
                 </Tooltip>
@@ -214,8 +227,6 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
         </div>
     );
 };
-
-const validateRequired = (value: string) => !!value?.length;
 
 const validatePositiveNumber = (value: string) => parseInt(value) >= 0;
 

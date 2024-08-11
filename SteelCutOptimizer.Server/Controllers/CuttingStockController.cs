@@ -3,6 +3,7 @@ using SteelCutOptimizer.Server.AmplApiServices;
 using SteelCutOptimizer.Server.AmplDataConverters;
 using SteelCutOptimizer.Server.DTO;
 using SteelCutOptimizer.Server.Enums;
+using SteelCutOptimizer.Server.Structs;
 using System.Text.Json;
 
 namespace SteelCutOptimizer.Server.Controllers

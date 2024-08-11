@@ -14,14 +14,23 @@ const postCuttingStockProblem = (body: CuttingStockProblemBody) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body),
-    }).then(o => {
-        return o.json();
+    }).then(async (response) => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            const errorBody = await response.text();
+            throw new Error(`${response.status}: ${errorBody}`);
+        }
+    }).catch(error => {
+        console.error('Request failed:', error);
+        throw error;
     });
 };
 
-const useSolveCuttingStockProblem = () => {
+const useSolveCuttingStockProblem = (onError: (error: Error) => void) => {
     return useMutation({
         mutationFn: postCuttingStockProblem,
+        onError: onError,
     });
 }
 

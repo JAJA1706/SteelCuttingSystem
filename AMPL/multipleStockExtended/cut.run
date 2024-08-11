@@ -1,5 +1,5 @@
 option solver cbc;
-#option solution_round 6;
+option solution_round 6;
 
 #model multipleStockExtended/cut.mod;
 #data multipleStockExtended/cut.dat;
@@ -64,6 +64,7 @@ repeat
 };
 
 #display lfep;
+#display rfep;
 
 option Cutting_Opt.relax_integrality 0;
 option Cutting_Opt.presolve 1;

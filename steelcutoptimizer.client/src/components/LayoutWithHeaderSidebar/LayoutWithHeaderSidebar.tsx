@@ -3,19 +3,23 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconRefresh, IconUpload, IconDownload } from '@tabler/icons-react';
 import MainContent from "../MainContent/MainContent"
 import classes from "./LayoutWithHeaderSidebar.module.css"
-import { useRef } from 'react';
+import useResetStore from "../../hooks/useResetStore"
+import { useShallow } from 'zustand/react/shallow';
 
 export default function LayoutWithHeaderSidebar() {
     const [opened, { toggle }] = useDisclosure();
 
+    const resetFunctions = useResetStore(useShallow((state) => ({
+        resetResult: state.resetResultFunction,
+        resetStock: state.resetStockDataFunction,
+        resetOrder: state.resetOrderDataFunction,
+    })));
+
     const onNewPlanClick = () => {
-        if (resetRef.current !== undefined)
-            resetRef.current();
+        resetFunctions.resetResult();
+        resetFunctions.resetStock();
+        resetFunctions.resetOrder();
     };
-    const resetRef = useRef<() => void>();
-    const setResetRef = (resetFunction: () => void) => {
-        resetRef.current = resetFunction;
-    }
 
     return (
         <AppShell
@@ -33,13 +37,13 @@ export default function LayoutWithHeaderSidebar() {
             </AppShell.Header>
 
             <AppShell.Navbar py="md" px={4}>
-                <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button}>New Plan</Button>
+                <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button} onClick={onNewPlanClick}>New Plan</Button>
                 <Button variant="subtle" leftSection={<IconDownload />} className={classes.button}>Import Plan</Button>
                 <Button variant="subtle" leftSection={<IconUpload />} className={classes.button}>Download Plan</Button>
             </AppShell.Navbar>
 
             <AppShell.Main>
-                <MainContent setResetFunction={setResetRef} />
+                <MainContent />
             </AppShell.Main>
         </AppShell>
     );

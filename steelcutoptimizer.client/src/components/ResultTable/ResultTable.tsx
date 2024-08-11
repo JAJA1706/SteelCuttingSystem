@@ -6,10 +6,15 @@ import {
 } from 'mantine-react-table';
 import classes from "./ResultTable.module.css"
 
+
+interface RelaxableLength {
+    length: number,
+    relaxAmount: number,
+}
 interface Pattern {
     patternId: number;
     count: number;
-    usedOrderLengths: number[], 
+    usedOrderLengths: RelaxableLength[], 
 }
 
 interface TableProps {
@@ -60,8 +65,12 @@ const ResultTable = ({ data }: TableProps) => {
                 result.push({
                     id: idx.toString(),
                     accessorFn: (row: Pattern) => {
-                        if (row.usedOrderLengths.length > idx)
-                            return `${row.usedOrderLengths[idx]}`
+                        if (row.usedOrderLengths.length > idx) {
+                            if (row.usedOrderLengths[idx].relaxAmount !== 0)
+                                return `${row.usedOrderLengths[idx].length} (+${row.usedOrderLengths[idx].relaxAmount})`;
+                            else
+                                return `${row.usedOrderLengths[idx].length}`;
+                        }
                         else
                             return '';
                     },

@@ -1,4 +1,7 @@
-﻿namespace SteelCutOptimizer.Server.Middleware
+﻿using System.Collections.Immutable;
+using System.Text;
+
+namespace SteelCutOptimizer.Server.Middleware
 {
     public class RequestRateLimiter
     {
@@ -23,7 +26,8 @@
                     var lastRequestTime = _clients[clientIP];
                     if ((currentTime - lastRequestTime).TotalSeconds < 1)
                     {
-                        context.Response.StatusCode = 429; // Too Many Requests
+                        context.Response.StatusCode = 429;
+                        context.Response.Body.WriteAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes("Too many requests")));
                         return;
                     }
                 }

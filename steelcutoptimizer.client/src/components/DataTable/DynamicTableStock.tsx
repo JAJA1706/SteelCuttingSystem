@@ -1,10 +1,7 @@
-import { useMemo, useState, useEffect, MutableRefObject } from 'react';
+import { useMemo, useState, useEffect, MutableRefObject, useCallback } from 'react';
 import {
     MantineReactTable,
-    createRow,
     type MRT_ColumnDef,
-    type MRT_Row,
-    type MRT_TableOptions,
     useMantineReactTable,
 } from 'mantine-react-table';
 import { ActionIcon, Button, Text, Tooltip } from '@mantine/core';
@@ -12,6 +9,7 @@ import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
 import classes from "./DynamicTableStock.module.css"
+import useResetStore from "../../hooks/useResetStore"
 
 export interface Stock {
     id: string;
@@ -35,12 +33,21 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
     const [isFetchingUsers, setIsFetchingUsers] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
+    const setResetStockDataFunction = useResetStore(state => state.setResetStockDataFunction);
+
+    const onHandleReset = useCallback(() => {
+        setData([]);
+    }, [setData])
+
+    useEffect(() => {
+        setResetStockDataFunction(onHandleReset);
+    }, [setResetStockDataFunction, onHandleReset])
+
     useEffect(() => {
         if (dataRef !== undefined)
             dataRef.current = data;
     }, [data, dataRef])
 
-    //DELETE action
     const openDeleteConfirmModal = () =>
         modals.openConfirmModal({
             centered: true,
@@ -165,6 +172,13 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
         [validationErrors],
     );
 
+    const isRemoveButtonDisabled = (): boolean => {
+        const selectedRows = table.getState().rowSelection;
+        if (Object.keys(selectedRows).length === 0)
+            return true
+        return false;
+    }
+
     const table = useMantineReactTable({
         columns,
         data: data,
@@ -195,7 +209,7 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
                     Add new
                 </Button>
                 <Tooltip label="Delete">
-                    <ActionIcon ml='xs' color="red" onClick={() => openDeleteConfirmModal()}>
+                    <ActionIcon ml='xs' color="red" onClick={() => openDeleteConfirmModal()} disabled={isRemoveButtonDisabled()} >
                         <IconTrash />
                     </ActionIcon>
                 </Tooltip>
@@ -216,8 +230,6 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
         </div>
     );
 };
-
-const validateRequired = (value: string) => !!value?.length;
 
 const validatePositiveNumber = (value: string) => parseInt(value) >= 0;
 

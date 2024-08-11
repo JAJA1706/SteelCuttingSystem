@@ -1,6 +1,6 @@
-﻿using SteelCutOptimizer.Server.AmplApiServices;
-using SteelCutOptimizer.Server.DTO;
+﻿using SteelCutOptimizer.Server.DTO;
 using System.Text;
+using SteelCutOptimizer.Server.Structs;
 
 namespace SteelCutOptimizer.Server.AmplDataConverters
 {
@@ -8,8 +8,11 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
     {
         public void AdjustEntryData(CuttingStockProblemDataDTO data)
         {
-            if (data.OrderList == null || data.StockList == null)
+            if (data.OrderList == null || data.StockList == null ||
+                data.OrderList.Count == 0 || data.StockList.Count == 0)
+            {
                 throw new InvalidDataException("Item list cannot be empty");
+            }
 
             foreach (var stock in data.StockList)
             {
@@ -56,35 +59,12 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
             File.WriteAllText(dataFilePath + "/cut.dat", fileContent.ToString());
         }
 
-        public CuttingStockResultsDTO ConvertResultDataToDTO(AmplResult amplResult)
-        {
-            CuttingStockResultsDTO dto = new ();
-            foreach(var pattern in amplResult.Patterns)
-            {
-                ResultItem item = new ResultItem();
-                item.StockLength = pattern.Value.StockLength;
-                item.UsedOrderLengths = pattern.Value.UsedOrderLengths;
-                item.Count = pattern.Value.UseCount;
-                if(item.Count > 0)
-                {
-                    dto.ResultItems.Add(item);
-                }
-            }
-
-            dto.ResultItems.Sort((itemX, itemY) => 
-                itemX.UsedOrderLengths.Count().CompareTo(itemY.UsedOrderLengths.Count())
-            );
-
-            for(int i = 0; i < dto.ResultItems.Count; ++i)
-            {
-                dto.ResultItems[i].PatternId = i + 1;
-            }
-
-            return dto;
-        }
-
         public void ValidateResultData(AmplResult amplResult, CuttingStockProblemDataDTO entryData)
         {
+            //Check if at least one proper Pattern exists 
+            if(!amplResult.Patterns.Values.Any(x => x.UseCount > 0))
+                throw new InvalidDataException("infeasible problem");
+
             //Checking if amount of stock items used is not greater than allowed
             Dictionary<int, int> usedStockLengths = [];
             foreach (var pattern in amplResult.Patterns)
@@ -99,6 +79,33 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                 if (stock.Count < usedStockLengths[stock.Length])
                     throw new InvalidDataException("infeasible problem");
             }
+        }
+
+        public CuttingStockResultsDTO ConvertResultDataToDTO(AmplResult amplResult)
+        {
+            CuttingStockResultsDTO dto = new();
+            foreach (var pattern in amplResult.Patterns)
+            {
+                ResultItem item = new ResultItem();
+                item.StockLength = pattern.Value.StockLength;
+                item.UsedOrderLengths = pattern.Value.UsedOrderLengths;
+                item.Count = pattern.Value.UseCount;
+                if (item.Count > 0)
+                {
+                    dto.ResultItems.Add(item);
+                }
+            }
+
+            dto.ResultItems.Sort((itemX, itemY) =>
+                itemX.UsedOrderLengths.Count().CompareTo(itemY.UsedOrderLengths.Count())
+            );
+
+            for (int i = 0; i < dto.ResultItems.Count; ++i)
+            {
+                dto.ResultItems[i].PatternId = i + 1;
+            }
+
+            return dto;
         }
     }
 }

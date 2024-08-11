@@ -28,3 +28,11 @@
 .table {
     margin: 15px 15px 15px 15px;
 }
+
+.notification {
+    position: fixed;
+    z-index: 100;
+    bottom: 100px;
+    right: 20px;
+    min-width: 200px;
+}

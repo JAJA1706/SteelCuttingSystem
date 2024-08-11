@@ -1,20 +1,32 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Button, Paper, Divider } from '@mantine/core'
 import DynamicTableStock, { Stock } from "../DataTable/DynamicTableStock"
 import DynamicTableOrder, { Order } from "../DataTable/DynamicTableOrder"
 import ResultTable from "../ResultTable/ResultTable"
 import classes from "./MainContent.module.css"
 import useSolveCuttingStockProblem from "../../hooks/useSolveCuttingStockProblem"
+import useResetStore from "../../hooks/useResetStore"
+import { showNotification } from '@mantine/notifications'
 
-interface MainContentProps {
-    setResetFunction: (resetFunction: () => void) => void,
-}
-
-const MainContent = ({ setResetFunction }: MainContentProps) => {
+const MainContent = () => {
     const stockDataRef = useRef<Stock[]>([]);
     const orderDataRef = useRef<Order[]>([]);
+    const setResetResultFunction = useResetStore((state) => state.setResetResultFunction);
 
-    const solveCuttingStockMutation = useSolveCuttingStockProblem();
+    const onSolvingError = (err: Error) => {
+        showNotification({
+            color: 'red',
+            title: "Error!",
+            message: err.message,
+            className: classes.notification,
+            autoClose: 5000
+        });
+    }
+
+    const { data: resultData,
+        mutate: solveCuttingStockProblem,
+        reset: resetResultData
+    } = useSolveCuttingStockProblem(onSolvingError);
 
     const onGenerateResultClick = () => {
         const requestBody = {
@@ -22,16 +34,16 @@ const MainContent = ({ setResetFunction }: MainContentProps) => {
             stockList: [...stockDataRef.current],
             orderList: [...orderDataRef.current],
         };
-        solveCuttingStockMutation.mutate(requestBody);
+        solveCuttingStockProblem(requestBody);
     }
 
-    const onHandleReset = () => {
-        console.log("reset");
-    }
+    const onHandleReset = useCallback(() => {
+        resetResultData();
+    }, [resetResultData])
 
     useEffect(() => {
-        setResetFunction(onHandleReset);
-    }, [setResetFunction])
+        setResetResultFunction(onHandleReset);
+    }, [setResetResultFunction, onHandleReset])
 
     return (
         <div className={classes.layout}>
@@ -53,7 +65,7 @@ const MainContent = ({ setResetFunction }: MainContentProps) => {
                 <Paper className={classes.resultTable} shadow="md" withBorder>
                     <div>
                         <ResultTable
-                            data={solveCuttingStockMutation.data?.resultItems ?? []}
+                            data={resultData?.resultItems ?? []}
                         />
                     </div>
                 </Paper>

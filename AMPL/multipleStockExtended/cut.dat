@@ -1,9 +1,9 @@
 data;
 param: ORDERS: orderLengths  orderNum  maxRelax :=
 	1	200		20		0
-	2	200		38		0
+	2	200		38		23
     3	300		35		0
-    4	375		24		0
+    4	375		24		14
     5	450		15		0
     6	500		10  	0;
 	
