@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Stock } from '../components/DataTable/DynamicTableStock'
+import { Stock } from '../components/DataTable/StockTable'
 
 interface StockStore {
     getStockData: () => Stock[],

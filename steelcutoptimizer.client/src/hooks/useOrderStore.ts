@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Order } from '../components/DataTable/DynamicTableOrder'
+import { Order } from '../components/DataTable/OrderTable'
 
 interface OrderStore {
     getOrderData: () => Order[],

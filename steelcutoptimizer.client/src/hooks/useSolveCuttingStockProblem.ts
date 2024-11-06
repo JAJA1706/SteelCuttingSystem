@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { Stock } from '../components/DataTable/DynamicTableStock';
-import { Order } from '../components/DataTable/DynamicTableOrder';
+import { Stock } from '../components/DataTable/StockTable';
+import { Order } from '../components/DataTable/OrderTable';
 
 interface CuttingStockProblemBody {
     problemType: string,

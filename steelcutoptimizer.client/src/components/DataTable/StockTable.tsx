@@ -1,22 +1,12 @@
 import { useMemo, useState, useEffect, MutableRefObject, useCallback } from 'react';
-import {
-    MantineReactTable,
-    type MRT_ColumnDef,
-    useMantineReactTable,
-} from 'mantine-react-table';
-import { ActionIcon, Button, Text, Tooltip } from '@mantine/core';
-import { modals } from '@mantine/modals';
-import { IconTrash } from '@tabler/icons-react';
+import { type MRT_ColumnDef } from 'mantine-react-table';
 import { v4 as uuidv4 } from 'uuid';
-import classes from "./DynamicTableStock.module.css"
 import useResetStore from "../../hooks/useResetStore"
 import useStockStore from "../../hooks/useStockStore"
 import { useShallow } from 'zustand/react/shallow';
+import DynamicTable, { BaseData } from '../DynamicTable/DynamicTable';
 
-export interface Stock {
-    id: string;
-    length: number | undefined;
-    count: number | undefined;
+export interface Stock extends BaseData {
     cost: number | undefined;
 }
 
@@ -30,10 +20,6 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
     >({});
 
     const [data, setData] = useState<Stock[]>([]);
-    const [isLoadingUsers] = useState<boolean>(false);
-    const [isLoadingUsersError] = useState<boolean>(false);
-    const [isFetchingUsers] = useState<boolean>(false);
-    const [isSaving] = useState<boolean>(false);
 
     const setResetStockDataFunction = useResetStore(state => state.setResetStockDataFunction);
     const setStockDataFunctions = useStockStore(useShallow((state) => ({ get: state.setGetStockDataFunction, set: state.setSetStockDataFunction })));
@@ -60,33 +46,6 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
         if (dataRef !== undefined)
             dataRef.current = data;
     }, [data, dataRef])
-
-    const openDeleteConfirmModal = () =>
-        modals.openConfirmModal({
-            centered: true,
-            children: (
-                <Text>
-                    Are you sure you want to delete selected rows?
-                    This action cannot be undone.
-                </Text>
-            ),
-            labels: { confirm: 'Delete', cancel: 'Cancel' },
-            confirmProps: { color: 'red' },
-            onConfirm: () => deleteSelectedRows(),
-        });
-
-    const deleteSelectedRows = (): void => {
-        const selectedRows: Record<string, boolean> = table.getState().rowSelection;
-        const rowsToDelete: string[] = [];
-        Object.entries(selectedRows).forEach(([key, value]) => {
-            if (value) {
-                rowsToDelete.push(key);
-            }
-        });
-        const newData = data.filter(x => !rowsToDelete.includes(x.id));
-        setData(newData);
-        table.setRowSelection({});
-    };
 
     const columns = useMemo<MRT_ColumnDef<Stock>[]>(
         () => [
@@ -185,61 +144,23 @@ const DynamicTableStock = ({ dataRef }: DynamicTableStockProps) => {
         [validationErrors],
     );
 
-    const isRemoveButtonDisabled = (): boolean => {
-        const selectedRows = table.getState().rowSelection;
-        if (Object.keys(selectedRows).length === 0)
-            return true
-        return false;
-    }
-
-    const table = useMantineReactTable({
-        columns,
-        data: data,
-        createDisplayMode: 'row',
-        editDisplayMode: 'table',
-        enableEditing: true,
-        positionActionsColumn: 'last',
-        getRowId: (row) => row.id,
-        enableRowSelection: true,
-        enableTopToolbar: false,
-        mantineTableBodyRowProps: {
-            className: classes.rows
-        },
-        renderBottomToolbarCustomActions: () => (
-            <>
-                <Button
-                    onClick={() => {
-                        setData((oldData) => {
-                            return [...oldData, {
-                                id: uuidv4(),
-                                length: 1,
-                                count: undefined,
-                                cost: undefined,
-                            }]
-                        });
-                    }}
-                >
-                    Add new
-                </Button>
-                <Tooltip label="Delete">
-                    <ActionIcon ml='xs' color="red" onClick={() => openDeleteConfirmModal()} disabled={isRemoveButtonDisabled()} >
-                        <IconTrash />
-                    </ActionIcon>
-                </Tooltip>
-            </>
-        ),
-        
-        state: {
-            isLoading: isLoadingUsers,
-            isSaving: isSaving,
-            showAlertBanner: isLoadingUsersError,
-            showProgressBars: isFetchingUsers,
-        },
-    });
+    const getDefaultNewRow = () => {
+        return {
+            id: uuidv4(),
+            length: 1,
+            count: undefined,
+            cost: undefined,
+        } as Stock;
+    } 
 
     return(
         <div>
-            <MantineReactTable table={table} />
+            <DynamicTable<Stock>
+                data={data}
+                setData={setData}
+                columns={columns}
+                getDefaultNewRow={getDefaultNewRow}
+            />
         </div>
     );
 };
@@ -248,4 +169,3 @@ const validatePositiveNumber = (value: string) => parseInt(value) >= 0;
 
 
 export default DynamicTableStock;
-

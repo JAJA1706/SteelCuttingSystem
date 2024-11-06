@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { Button, Paper, Divider } from '@mantine/core'
-import DynamicTableStock, { Stock } from "../DataTable/DynamicTableStock"
-import DynamicTableOrder, { Order } from "../DataTable/DynamicTableOrder"
+import StockTable, { Stock } from "../DataTable/StockTable"
+import OrderTable, { Order } from "../DataTable/OrderTable"
 import ResultTable from "../ResultTable/ResultTable"
 import classes from "./MainContent.module.css"
 import useSolveCuttingStockProblem from "../../hooks/useSolveCuttingStockProblem"
@@ -51,10 +51,10 @@ const MainContent = () => {
                 <Paper className={classes.upperBody} shadow="md" withBorder>
                     <div className={classes.dynTables}>
                         <div className={classes.table}>
-                            <DynamicTableStock dataRef={stockDataRef} />
+                            <StockTable dataRef={stockDataRef} />
                         </div>
                         <div className={classes.table}>
-                            <DynamicTableOrder dataRef={orderDataRef} />
+                            <OrderTable dataRef={orderDataRef} />
                         </div>
                     </div>
                     <Button onClick={onGenerateResultClick}>
