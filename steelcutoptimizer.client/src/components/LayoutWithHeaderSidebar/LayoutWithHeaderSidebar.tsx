@@ -1,4 +1,4 @@
-import { AppShell, Button, Burger, Group, Modal } from '@mantine/core';
+import { AppShell, Image, Button, Burger, Group, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconRefresh, IconUpload, IconDownload } from '@tabler/icons-react';
 import FileImportPopup from "../FileImportPopup/FileImportPopup";
@@ -9,6 +9,7 @@ import useStockStore from "../../hooks/useStockStore";
 import useOrderStore from "../../hooks/useOrderStore";
 import { useShallow } from 'zustand/react/shallow';
 import downloadFile from "../../utils/downloadFile"
+import logo from "../../assets/logo.webp";
 
 export default function LayoutWithHeaderSidebar() {
     const [opened, { toggle }] = useDisclosure();
@@ -41,11 +42,16 @@ export default function LayoutWithHeaderSidebar() {
             padding="md"
         >
             <AppShell.Header bg='blue.1'>
-                    <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" h="100%" px="md"/>
-                <Group h="100%" ml="xl" gap={10} visibleFrom="sm" justify="flex-end" mr={10}>
-                    <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button} onClick={onNewPlanClick}>New Plan</Button>
-                    <Button variant="subtle" leftSection={<IconDownload />} className={classes.button} onClick={openFileInputModal}>Import Plan</Button>
-                    <Button variant="subtle" leftSection={<IconUpload />} className={classes.button} onClick={onDownloadPlanClick}>Download Plan</Button>
+                <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" h="100%" px="md" />
+                <Group h="100%" ml="xs" justify="space-between">
+                    <Group h="100%" ml="xs" gap={10} visibleFrom="sm" justify="flex-start" mr={10}>
+                        <Image src={logo} h={60} />  
+                    </Group>
+                    <Group h="100%" ml="xl" gap={10} visibleFrom="sm" justify="flex-end" mr={10}>
+                        <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button} onClick={onNewPlanClick}>New Plan</Button>
+                        <Button variant="subtle" leftSection={<IconDownload />} className={classes.button} onClick={openFileInputModal}>Import Plan</Button>
+                        <Button variant="subtle" leftSection={<IconUpload />} className={classes.button} onClick={onDownloadPlanClick}>Download Plan</Button>
+                    </Group>
                 </Group>
             </AppShell.Header>
 
