@@ -1,8 +1,16 @@
 .layout{
     display:flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    flex-direction: row;
+    gap: 20px;
 }
+
+.algorithmEditor{
+    max-width: 200px;
+    
+}
+
 
 .mainBody {
     display: flex;
@@ -35,4 +43,14 @@
     bottom: 100px;
     right: 20px;
     min-width: 200px;
+}
+
+@media (max-width: 1000px) {
+    .layout{
+        display: flex;
+        gap: 20px;
+        flex-direction: column;
+        align-items: center;
+    }
+
 }

@@ -7,6 +7,7 @@ import classes from "./MainContent.module.css"
 import useSolveCuttingStockProblem from "../../hooks/useSolveCuttingStockProblem"
 import useResetStore from "../../hooks/useResetStore"
 import { showNotification } from '@mantine/notifications'
+import SettingsPanel from '../SettingsPanel/SettingsPanel'
 
 const MainContent = () => {
     const stockDataRef = useRef<Stock[]>([]);
@@ -47,6 +48,11 @@ const MainContent = () => {
 
     return (
         <div className={classes.layout}>
+            <Paper className={classes.algorithmEditor} shadow="md" withBorder>
+                <SettingsPanel />
+            </Paper>
+            <Divider hiddenFrom='sm' w={"100%"} size="lg"/>
+            <Divider visibleFrom="sm" size="lg" orientation="vertical" />
             <div className={classes.mainBody}>
                 <Paper className={classes.upperBody} shadow="md" withBorder>
                     <div className={classes.dynTables}>

@@ -1,0 +1,9 @@
+.panelLayout{
+    max-width: 200px;
+}
+
+@media (max-width: 1000px) {
+    .panelLayout{
+        max-width: 100%;
+    }
+}

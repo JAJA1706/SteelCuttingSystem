@@ -73,6 +73,9 @@ const DynamicTable = <T extends BaseData>({
         mantineTableBodyRowProps: {
             className: classes.rows
         },
+        localization: {
+            rowsPerPage: ""
+        },
         renderBottomToolbarCustomActions: () => (
             <>
                 <Button
