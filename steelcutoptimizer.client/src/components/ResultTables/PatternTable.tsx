@@ -4,7 +4,7 @@ import {
     type MRT_ColumnDef,
     useMantineReactTable,
 } from 'mantine-react-table';
-import classes from "./ResultTable.module.css"
+import classes from "./PatternTable.module.css"
 
 
 interface RelaxableLength {
@@ -21,7 +21,7 @@ interface TableProps {
     data: Pattern[];
 }
 
-const ResultTable = ({ data }: TableProps) => {
+const PatternTable = ({ data }: TableProps) => {
     const [isLoadingUsers] = useState<boolean>(false);
     const [isLoadingUsersError] = useState<boolean>(false);
     const [isFetchingUsers] = useState<boolean>(false);
@@ -113,7 +113,7 @@ const ResultTable = ({ data }: TableProps) => {
         },
     });
 
-    return(
+    return (
         <div>
             <MantineReactTable table={table} />
         </div>
@@ -122,5 +122,5 @@ const ResultTable = ({ data }: TableProps) => {
 
 
 
-export default ResultTable;
+export default PatternTable;
 

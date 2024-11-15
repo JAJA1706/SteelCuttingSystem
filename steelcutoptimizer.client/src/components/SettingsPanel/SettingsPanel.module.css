@@ -1,9 +1,40 @@
-.panelLayout{
-    max-width: 200px;
+.panelLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-@media (max-width: 1000px) {
-    .panelLayout{
-        max-width: 100%;
+.buttonLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.radioGroup {
+    gap: 0px;
+    margin: 5px 5px 5px 5px
+}
+
+/*.radio{
+    min-width: 78px;
+}*/
+
+.radioLabel {
+    padding-inline-start: 0.5rem;
+}
+
+.textArea {
+    margin: 5px 5px 5px 5px
+}
+
+@media (max-width: $breakpointSM) {
+    .buttonLayout {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
     }
+
+/*    .radio {
+        min-width: 0px;
+    }*/
 }

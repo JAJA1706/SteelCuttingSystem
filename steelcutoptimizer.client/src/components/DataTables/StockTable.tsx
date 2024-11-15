@@ -2,32 +2,35 @@ import { useMemo, useState, useEffect, MutableRefObject, useCallback } from 'rea
 import { type MRT_ColumnDef } from 'mantine-react-table';
 import { v4 as uuidv4 } from 'uuid';
 import useResetStore from "../../hooks/useResetStore"
-import useOrderStore from "../../hooks/useOrderStore"
+import useStockStore from "../../hooks/useStockStore"
 import { useShallow } from 'zustand/react/shallow';
-import DynamicTable, { BaseData } from '../DynamicTable/DynamicTable';
+import DynamicTable, { BaseData } from './DynamicTable';
+import { Settings } from '../SettingsPanel/SettingsPanel';
 
-export interface Order extends BaseData {
-    maxRelax: number | undefined;
+export interface Stock extends BaseData {
+    cost: number | undefined;
 }
 
-interface DynamicTableOrderProps {
-    dataRef: MutableRefObject<Order[]>,
+interface DynamicTableStockProps {
+    dataRef: MutableRefObject<Stock[]>,
+    algorithmSettings: Settings,
 }
 
-const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
+const DynamicTableStock = ({ dataRef, algorithmSettings }: DynamicTableStockProps) => {
     const [validationErrors, setValidationErrors] = useState<
         Record<string, string | undefined>
     >({});
 
-    const [data, setData] = useState<Order[]>([]);
-    const setResetOrderDataFunction = useResetStore(state => state.setResetOrderDataFunction);
-    const setOrderDataFunctions = useOrderStore(useShallow((state) => ({ get: state.setGetOrderDataFunction, set: state.setSetOrderDataFunction })));
+    const [data, setData] = useState<Stock[]>([]);
 
-    const setOrderData = useCallback((newData: Order[]) => {
+    const setResetStockDataFunction = useResetStore(state => state.setResetStockDataFunction);
+    const setStockDataFunctions = useStockStore(useShallow((state) => ({ get: state.setGetStockDataFunction, set: state.setSetStockDataFunction })));
+
+    const setStockData = useCallback((newData: Stock[]) => {
         setData(newData);
     }, [setData])
 
-    const getOrderData = useCallback((): Order[] => {
+    const getStockData = useCallback((): Stock[] => {
         return data;
     }, [data])
 
@@ -36,19 +39,20 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
     }, [setData])
 
     useEffect(() => {
-        setOrderDataFunctions.get(getOrderData);
-        setOrderDataFunctions.set(setOrderData);
-        setResetOrderDataFunction(onHandleReset);
-    }, [setResetOrderDataFunction, onHandleReset, setOrderDataFunctions, getOrderData, setOrderData])
+        setStockDataFunctions.get(getStockData);
+        setStockDataFunctions.set(setStockData);
+        setResetStockDataFunction(onHandleReset);
+    }, [setResetStockDataFunction, onHandleReset, setStockDataFunctions, getStockData, setStockData])
 
     useEffect(() => {
         if (dataRef !== undefined)
             dataRef.current = data;
     }, [data, dataRef])
 
-    const columns = useMemo<MRT_ColumnDef<Order>[]>(
-        () => [
-            {
+    const columns = useMemo<MRT_ColumnDef<Stock>[]>(
+        () => {
+            const columnsDef: MRT_ColumnDef<Stock>[] = [];
+            columnsDef.push({
                 accessorKey: 'length',
                 header: 'Length',
                 size: 80,
@@ -68,7 +72,7 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
                             ...validationErrors,
                             [cell.id]: validationError,
                         });
-                        
+
                         setData((prevData) =>
                             prevData.map((item) =>
                                 item.id === row.id ? { ...item, length: parseInt(value) } : item
@@ -76,38 +80,10 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
                         );
                     },
                 }),
-            },
-            {
+            });
+            columnsDef.push({
                 accessorKey: 'count',
                 header: 'Count',
-                size: 80,
-                mantineEditTextInputProps: ({ cell, row }) => ({
-                    type: 'number',
-                    required: true,
-                    error: validationErrors?.[cell.id],
-                    onFocus: (event) => {
-                        event.target.select();
-                    },
-                    onBlur: (event) => {
-                        const value = event.currentTarget.value;
-                        const validationError = !validatePositiveNumber(value)
-                            ? 'Positive number required'
-                            : undefined;
-                        setValidationErrors({
-                            ...validationErrors,
-                            [cell.id]: validationError,
-                        });
-                        setData((prevData) =>
-                            prevData.map((item) =>
-                                item.id === row.id ? { ...item, count: parseInt(value) } : item
-                            )
-                        );
-                    },
-                }),
-            },
-            {
-                accessorKey: 'maxRelax',
-                header: 'maxRelax',
                 size: 80,
                 mantineEditTextInputProps: ({ cell, row }) => ({
                     type: 'number',
@@ -130,28 +106,64 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
                         });
                         setData((prevData) =>
                             prevData.map((item) =>
-                                item.id === row.id ? { ...item, maxRelax: parseInt(value) } : item
+                                item.id === row.id ? { ...item, count: parseInt(value) } : item
                             )
                         );
                     },
                 }),
-            },
-        ],
-        [validationErrors],
+            });
+
+            if (algorithmSettings.mainObjective === "cost")
+            {
+                columnsDef.push({
+                    accessorKey: 'cost',
+                    header: 'Cost',
+                    size: 80,
+                    mantineEditTextInputProps: ({ cell, row }) => ({
+                        type: 'number',
+                        required: true,
+                        error: validationErrors?.[cell.id],
+                        onFocus: (event) => {
+                            event.target.select();
+                        },
+                        onBlur: (event) => {
+                            const value = event.currentTarget.value;
+                            if (value === '')
+                                return;
+
+                            const validationError = !validatePositiveNumber(value)
+                                ? 'Positive number required'
+                                : undefined;
+                            setValidationErrors({
+                                ...validationErrors,
+                                [cell.id]: validationError,
+                            });
+                            setData((prevData) =>
+                                prevData.map((item) =>
+                                    item.id === row.id ? { ...item, cost: parseInt(value) } : item
+                                )
+                            );
+                        },
+                    }),
+                });
+            }
+            return columnsDef;
+        },
+        [validationErrors, algorithmSettings],
     );
 
     const getDefaultNewRow = () => {
         return {
             id: uuidv4(),
             length: 1,
-            count: 1,
-            maxRelax: undefined,
-        } as Order;
+            count: undefined,
+            cost: undefined,
+        } as Stock;
     } 
 
-    return (
+    return(
         <div>
-            <DynamicTable<Order>
+            <DynamicTable<Stock>
                 data={data}
                 setData={setData}
                 columns={columns}
@@ -164,5 +176,4 @@ const DynamicTableOrder = ({ dataRef }: DynamicTableOrderProps) => {
 const validatePositiveNumber = (value: string) => parseInt(value) >= 0;
 
 
-export default DynamicTableOrder;
-
+export default DynamicTableStock;

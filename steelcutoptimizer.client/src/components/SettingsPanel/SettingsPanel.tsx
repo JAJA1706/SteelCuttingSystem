@@ -1,32 +1,79 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Radio, Group, Button, Paper, Divider } from '@mantine/core'
-import StockTable, { Stock } from "../DataTable/StockTable"
-import OrderTable, { Order } from "../DataTable/OrderTable"
-import ResultTable from "../ResultTable/ResultTable"
+import { Dispatch, SetStateAction } from 'react'
+import { Radio, Group, Text, Divider } from '@mantine/core'
 import classes from "./SettingsPanel.module.css"
-import useSolveCuttingStockProblem from "../../hooks/useSolveCuttingStockProblem"
-import useResetStore from "../../hooks/useResetStore"
-import { showNotification } from '@mantine/notifications'
 
-const SettingsPanel = () => {
-    const [mainObjective, setMainObjective] = useState("cost");
+export interface Settings {
+    mainObjective: string,
+    relaxationType: string,
+}
+
+interface SettingsPanelProps {
+    settings: Settings,
+    setSettings: Dispatch<SetStateAction<Settings>>;
+}
+
+const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
     const onMainObjectiveChange = (e: string) => {
-        setMainObjective(e);
+        setSettings(prev => {
+            return {
+                ...prev,
+                mainObjective: e,
+            };
+        })
+    };
+    const onRelaxationTypeChange = (e: string) => {
+        setSettings(prev => {
+            return {
+                ...prev,
+                relaxationType: e,
+            };
+        })
     };
 
     return (
         <div className={classes.panelLayout}>
-            <p> hasudfhasdiufhiuadhf </p>
-            <Radio.Group
-                value={mainObjective}
-                onChange={onMainObjectiveChange}
-                label="Minimize:"
-            >
-                <Group>
-                    <Radio value="cost" label="Cost" />
-                    <Radio value="waste" label="Waste" />
-                </Group>
-            </Radio.Group>
+            <div className={classes.buttonLayout}>
+                <Radio.Group
+                    value={settings.mainObjective}
+                    onChange={onMainObjectiveChange}
+                    label="Minimize:"
+                    className={classes.radioGroup}
+                >
+                    <Group>
+                        <div className={classes.radio}>
+                            <Radio value="cost" label="Cost" classNames={{ label: classes.radioLabel }} />
+                        </div>
+                        <div className={classes.radio}>
+                            <Radio value="waste" label="Waste" classNames={{ label: classes.radioLabel }} />
+                        </div>
+                    </Group>
+                </Radio.Group>
+
+                <Radio.Group
+                    value={settings.relaxationType}
+                    onChange={onRelaxationTypeChange}
+                    label="Relaxation type:"
+                    className={classes.radioGroup}
+                >
+                    <Group>
+                        <div className={classes.radio}>
+                            <Radio value="manual" label="Manual" classNames={{ label: classes.radioLabel }} />
+                        </div>
+                        <div className={classes.radio}>
+                            <Radio value="auto" label="Auto" classNames={{ label: classes.radioLabel }} />
+                        </div>
+                        <div className={classes.radio}>
+                            <Radio value="singleStep" label="Single Step" classNames={{ label: classes.radioLabel }} />
+                        </div>
+                    </Group>
+                </Radio.Group>
+            </div>
+            <Divider />
+            <div className={classes.textArea}>
+                <Text fw={700}>Algorithm Description</Text>
+                <Text> Ten algorytm robi takie rzeczy że ludziom się nie śniły. Największe mocarstwa nękaja mnie żebym podesłał im szczegóły tego zajebiście dowalonego w kosmos algorytmu mocy.
+                    Użycie go co najmniej pozwala zawładnąć światem, a co najwyżej całkowicie go zniszczyć. Zastanów się dobrze przed kliknięciem "generuj".</Text>
+            </div>
         </div>
     )
 }
