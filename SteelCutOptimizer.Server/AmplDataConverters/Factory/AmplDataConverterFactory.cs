@@ -1,18 +1,18 @@
-﻿using SteelCutOptimizer.Server.AmplApiServices;
-using SteelCutOptimizer.Server.Enums;
+﻿using SteelCutOptimizer.Server.Structs;
 
 namespace SteelCutOptimizer.Server.AmplDataConverters
 {
     public class AmplDataConverterFactory : IAmplDataConverterFactory
     {
-        public IAmplDataConverter Create( CuttingStockProblemType problemType )
+        public IAmplDataConverter Create( AlgorithmSettings settings, string dataUniqueId )
         {
-            switch (problemType)
+            if(settings.MainObjective == "cost" || settings.MainObjective == "waste")
             {
-                case CuttingStockProblemType.MultipleStock:
-                    return new MultipleStockDataConverter();
-                default:
-                    throw new NotImplementedException();
+                return new MultipleStockDataConverter(settings, dataUniqueId);
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
         }
     }

@@ -1,14 +1,19 @@
 .layout{
     display:flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.algorithmEditor{
+    max-width: 300px;
 }
 
 .mainBody {
     display: flex;
     flex-direction: column;
     max-width: 1200px;
-    /*min-width: 1500px;*/
 }
 
 .upperBody {
@@ -25,8 +30,39 @@
     flex-wrap: wrap;
 }
 
+.tableWithButtons{
+    display: flex;
+    flex-direction: column;
+}
+
 .table {
     margin: 15px 15px 15px 15px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    margin: 5px 10px 20px 10px;
+
+}
+
+.buttons .button {
+    width: 200px;
+}
+
+.switch {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.resultTables {
+    display: flex;
+    flex-direction: column;
 }
 
 .notification {
@@ -35,4 +71,17 @@
     bottom: 100px;
     right: 20px;
     min-width: 200px;
+}
+
+@media (max-width: $breakpointSM) {
+    .layout {
+        display: flex;
+        gap: 20px;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .algorithmEditor {
+        max-width: 100%;
+    }
 }

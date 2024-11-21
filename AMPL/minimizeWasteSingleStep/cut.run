@@ -1,0 +1,35 @@
+option solver cbc;
+option solution_round 6;
+
+#model .../cut.mod;
+#data .../cut.dat;
+
+problem Cutting_Opt_Relax: usedPatterns, Waste, FillOrder, StockLimit;
+   option relax_integrality 1;
+   option presolve 0;
+
+problem Pattern_Gen_Relax: Use, Relax, RelaxSum, PatternCost, LengthLimit, RelaxLimit, IsRelaxationAllowed;
+   option relax_integrality 0;
+   option presolve 1;
+
+
+param isFeasible;
+param i := stockItemToRelax;
+let isFeasible := 1;
+let minNewPatternCost :=  prevStockLimit[i] - 0.0001;
+let stockLength := stockLengths[i];
+solve Pattern_Gen_Relax;
+
+if solve_result == "infeasible" or solve_result_num == 200 then 
+{
+	let isFeasible := 0;
+}
+else
+{
+	let nPAT[i] := nPAT[i] + 1;
+	let {x in ORDERS} lfep[i,x,nPAT[i]] := Use[x];
+	let {x in ORDERS} rfep[i,x,nPAT[i]] := Relax[x];
+}
+
+solve Cutting_Opt_Relax;
+let {x in ORDERS} price[x] := FillOrder[x].dual;

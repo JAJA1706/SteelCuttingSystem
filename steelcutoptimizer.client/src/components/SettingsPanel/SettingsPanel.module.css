@@ -1,0 +1,38 @@
+.panelLayout {
+    display: flex;
+    flex-direction: column;
+}
+
+.buttonLayout {
+    display: flex;
+    flex-direction: column;
+}
+
+.radioGroup {
+    gap: 0px;
+    margin: 0px 5px 10px 5px
+}
+
+/*.radio{
+    min-width: 78px;
+}*/
+
+.radioLabel {
+    padding-inline-start: 0.5rem;
+}
+
+.textArea {
+    margin: 5px 5px 5px 5px
+}
+
+@media (max-width: $breakpointSM) {
+    .buttonLayout {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+
+/*    .radio {
+        min-width: 0px;
+    }*/
+}

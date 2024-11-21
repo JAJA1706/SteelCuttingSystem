@@ -1,9 +1,0 @@
-data;
-param rawBarWidth := 1200;
-param: ORDERS: widths  barsNum  maxRelax :=
-1  200  400  0
-2  200  350  20
-3  450  240  0
-4  500  170  20
-5  550  210  25
-;

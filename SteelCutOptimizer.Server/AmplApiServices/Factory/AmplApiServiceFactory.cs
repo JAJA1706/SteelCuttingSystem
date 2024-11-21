@@ -1,17 +1,21 @@
-﻿using SteelCutOptimizer.Server.Enums;
+﻿using SteelCutOptimizer.Server.Structs;
 
 namespace SteelCutOptimizer.Server.AmplApiServices
 {
     public class AmplApiServiceFactory : IAmplApiServiceFactory
     {
-        public IAmplApiService Create( CuttingStockProblemType problemType )
+        public IAmplApiService Create( AlgorithmSettings settings )
         {
-            switch (problemType)
+            if (settings.MainObjective == "cost" || settings.MainObjective == "waste")
             {
-                case CuttingStockProblemType.MultipleStock:
-                    return new MultipleStockService();
-                default:
-                    throw new NotImplementedException();
+                if (settings.RelaxationType == "none")
+                    return new MultipleStockService(settings);
+                else
+                    return new MultipleStockRelaxService(settings);
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
         }
     }

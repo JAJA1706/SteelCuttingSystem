@@ -1,4 +1,4 @@
-import { AppShell, Image, Button, Burger, Group, Modal } from '@mantine/core';
+import { AppShell, Image, Button, Burger, Group, Modal, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconRefresh, IconUpload, IconDownload } from '@tabler/icons-react';
 import FileImportPopup from "../FileImportPopup/FileImportPopup";
@@ -38,14 +38,17 @@ export default function LayoutWithHeaderSidebar() {
     return (
         <AppShell
             header={{ height: 60 }}
-            navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true, mobile: !opened } }}
+            navbar={{ width: 300, breakpoint: "sm", collapsed: { desktop: true, mobile: !opened } }}
             padding="md"
         >
             <AppShell.Header bg='blue.1'>
                 <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" h="100%" px="md" />
                 <Group h="100%" ml="xs" justify="space-between">
-                    <Group h="100%" ml="xs" gap={10} visibleFrom="sm" justify="flex-start" mr={10}>
-                        <Image src={logo} h={60} />  
+                    <Group h="100%" ml="xs" gap={5} visibleFrom="sm" justify="flex-start" mr={10}>
+                        <Image src={logo} h={60} />
+                        <Text className={classes.text}>
+                            Steel Cutting System
+                        </Text>
                     </Group>
                     <Group h="100%" ml="xl" gap={10} visibleFrom="sm" justify="flex-end" mr={10}>
                         <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button} onClick={onNewPlanClick}>New Plan</Button>

@@ -39,6 +39,9 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [plugin()],
+    css: {
+        postcss: './postcss.config.cjs'
+    },
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))

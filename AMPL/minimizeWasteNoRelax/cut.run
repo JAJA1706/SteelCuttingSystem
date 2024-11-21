@@ -1,0 +1,74 @@
+option solver cbc;
+option solution_round 6;
+
+#model .../cut.mod;
+#data .../cut.dat;
+
+problem Cutting_Opt: usedPatterns, Waste, FillOrder, StockLimit;
+   option relax_integrality 1;
+   option presolve 0;
+
+problem Pattern_Gen: Use, ReducedCost, LengthLimit;
+   option relax_integrality 0;
+   option presolve 1;
+
+for {i in STOCK}
+{
+	let nPAT[i] := 0;
+}
+
+param temp;
+for {i in STOCK}
+{
+	for{ x in ORDERS}
+	{
+		let temp := floor(stockLengths[i] / orderLengths[x]);
+		if temp > 0 then
+		{
+			let nPAT[i] := nPAT[i] + 1;
+			let lfep[i,x,nPAT[i]] := temp;
+			let {x2 in ORDERS: x2 <> x} lfep[i,x2,nPAT[i]] := 0;
+		}
+	}
+};
+
+param stockLimitSaved {STOCK};
+param isFeasible;
+let isFeasible := 1;
+param isNewPattern;
+repeat
+{
+	solve Cutting_Opt;
+	let {x in ORDERS} price[x] := FillOrder[x].dual;
+	let {i in STOCK} stockLimitSaved[i] := StockLimit[i];
+	
+	let isNewPattern := 0;
+	for{i in STOCK}
+	{
+		let stockLength := stockLengths[i];
+		solve Pattern_Gen;
+		
+		if ReducedCost - StockLimit[i] < -0.00001 then
+		{
+			let nPAT[i] := nPAT[i] + 1;
+			let {x in ORDERS} lfep[i,x,nPAT[i]] := Use[x];
+			let isNewPattern := 1;
+		}
+	};
+
+	if isNewPattern = 0 then
+	{
+		break;
+	}
+		
+};
+
+
+option Cutting_Opt.relax_integrality 0;
+option Cutting_Opt.presolve 10;
+solve Cutting_Opt;
+
+if solve_result == "infeasible" or solve_result_num == 200 then 
+{
+	let isFeasible := 0;
+}

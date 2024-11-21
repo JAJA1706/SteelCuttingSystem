@@ -2,22 +2,25 @@
 {
     public class Pattern
     {
+        public int StockId { get; set; } //we need the stockId in case there is multiple StockItems with the same length
         public int StockLength { get; set; }
         public int UseCount { get; set; }
-        public List<RelaxableLength> UsedOrderLengths { get; set; } = [];
+        public List<Segment> SegmentList { get; set; } = [];
 
         public Pattern()
         {
+            StockId = 0;
             StockLength = 0;
             UseCount = 0;
-            UsedOrderLengths = new List<RelaxableLength>();
+            SegmentList = new List<Segment>();
         }
 
-        public Pattern(int stockLength, int useCount, List<RelaxableLength> usedOrderLengths)
+        public Pattern(int stockId, int stockLength, int useCount, List<Segment> listOfSegments)
         {
+            StockId = stockId;
             StockLength = stockLength;
             UseCount = useCount;
-            UsedOrderLengths.AddRange(usedOrderLengths);
+            SegmentList.AddRange(listOfSegments);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using SteelCutOptimizer.Server.Enums;
+﻿using SteelCutOptimizer.Server.Structs;
 
 namespace SteelCutOptimizer.Server.AmplDataConverters
 {
     public interface IAmplDataConverterFactory
     {
-        public IAmplDataConverter Create( CuttingStockProblemType problemType );
+        public IAmplDataConverter Create(AlgorithmSettings settings, string dataUniqueId);
     }
 }
