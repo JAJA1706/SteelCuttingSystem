@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Order } from '../components/DataTable/OrderTable'
+import { Order } from '../components/DataTables/OrderTable'
 
 interface OrderStore {
     getOrderData: () => Order[],

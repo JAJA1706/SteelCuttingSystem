@@ -1,44 +1,53 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
     MantineReactTable,
     type MRT_ColumnDef,
     useMantineReactTable,
 } from 'mantine-react-table';
 import classes from "./OutputVariablesTable.module.css"
+import { AmplResults } from "../../hooks/useSolveCuttingStockProblem"
 
 
-interface CostMinimizingVariables {
-    cost: number;
-    waste: number;
-    patternCount: number;
+interface OutputVariables {
+    totalCost: string;
+    totalWaste: string;
+    totalRelax: string;
 }
 
 interface TableProps {
-    data: CostMinimizingVariables[];
+    data: AmplResults | undefined;
 }
 
 const OutputVariablesTable = ({ data }: TableProps) => {
-    const columns = useMemo<MRT_ColumnDef<CostMinimizingVariables>[]>(() => [
+    const displayedData = useMemo<OutputVariables[]>(() => {
+        return [{
+            totalCost: data?.totalCost?.toString() ?? "---",
+            totalWaste: data?.totalWaste.toString() ?? "---",
+            totalRelax: data?.totalRelax?.toString() ?? "---",
+        }]
+    }, [data]);
+
+    const columns = useMemo<MRT_ColumnDef<OutputVariables>[]>(() => [
         {
-            accessorKey: 'cost',
+            accessorKey: 'totalCost',
             header: 'Cost',
             size: 130,
         },
         {
-            accessorKey: 'waste',
+            accessorKey: 'totalWaste',
             header: 'Waste',
             size: 130,
         },
         {
-            accessorKey: 'patternCount',
-            header: 'Pattern Count',
+            accessorKey: 'totalRelax',
+            header: 'Total Relax',
             size: 130,
         },
     ], []);
 
     const table = useMantineReactTable({
         columns,
-        data: data,
+        data: displayedData,
         createDisplayMode: 'row',
         editDisplayMode: 'table',
         enableColumnResizing: false,

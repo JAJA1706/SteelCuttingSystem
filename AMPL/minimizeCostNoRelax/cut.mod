@@ -1,25 +1,19 @@
 # ----------------------------------------
-# CUTTING STOCK USING PATTERNS
+# CUTTING STOCK USING PATTERNS WITH MULTIPLE STOCK ITEMS
 # ----------------------------------------
 set STOCK;
 param stockLengths {STOCK} > 0;        		# length of raw bars [.dat]
 param stockNum {STOCK} > 0;        			# num of raw bars [.dat]
-param stockCost {STOCK} > 0;
+param stockCost {STOCK} > 0;				# cost of raw bars [.dat]
 set ORDERS;                   				# set of orderLengths to be cut [.dat]
 param orderLengths {ORDERS} > 0;			# length of ordered bars [.dat]
 param orderNum {ORDERS} > 0;    			# number of each length to be cut [.dat]
-param maxRelax {ORDERS};	  				# max relaxation percentage [.dat]
 				                            
 param nPAT {STOCK} integer >= 0;      							# number of patterns for each STOCK
 set PATTERNS {i in STOCK} := 1..nPAT[i];      					# set of patterns in Stock
-param lfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;		# orderLengths for each pattern
-								                            	# defn of patterns: nbr[i,j] = number
-								                            	# of bars of length i in pattern j	                            
-var usedPatterns {i in STOCK, PATTERNS[i]} integer >= 0; 		#how many patterns of each type
-				                            
-param rfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;		#relax for each pattern
-																#only for display purposes
-	
+param lfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;		# orderLengths for each pattern                           
+var usedPatterns {i in STOCK, PATTERNS[i]} integer >= 0; 		# how many patterns of each type
+				                           
 minimize Cost:
 	sum {i in STOCK, j in PATTERNS[i]} stockCost[i] * usedPatterns[i,j];
 subj to FillOrder {x in ORDERS}:
@@ -29,7 +23,7 @@ subj to StockLimit {i in STOCK}:
 							
    
 # ----------------------------------------
-# KNAPSACK SUBPROBLEM WITH RELAXATION
+# KNAPSACK SUBPROBLEM
 # ----------------------------------------
 param relaxCost default 0.0001;
 param price {ORDERS} default 0.0;
@@ -38,8 +32,6 @@ var Use {ORDERS} integer >= 0;
 var Relax {ORDERS} integer >= 0;
 	
 maximize ReducedCost:
-   sum {i in ORDERS} (price[i] * Use[i] - Relax[i] * relaxCost);
+   sum {x in ORDERS} (price[x] * Use[x]);
 subj to LengthLimit:
-   sum {i in ORDERS} (orderLengths[i] * Use[i] - Relax[i]) <= rawBarLength;
-subj to RelaxLimit {i in ORDERS}:
-	Relax[i] <= maxRelax[i]*Use[i];
+   sum {x in ORDERS} (orderLengths[x] * Use[x]) <= rawBarLength;

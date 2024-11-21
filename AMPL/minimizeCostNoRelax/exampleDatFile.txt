@@ -1,0 +1,12 @@
+data;
+param: ORDERS: orderLengths  orderNum :=
+	1	200		20
+	2	177		38
+    3	300		35
+    4	361		24
+    5	450		15
+    6	500		10;
+	
+param: STOCK: stockLengths stockNum stockCost :=
+	1	1200 100 12
+	2	1000 100 10

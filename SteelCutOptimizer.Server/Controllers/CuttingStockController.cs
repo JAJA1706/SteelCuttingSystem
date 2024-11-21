@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using SteelCutOptimizer.Server.AmplApiServices;
 using SteelCutOptimizer.Server.AmplDataConverters;
 using SteelCutOptimizer.Server.DTO;
-using SteelCutOptimizer.Server.Enums;
 using SteelCutOptimizer.Server.Structs;
+using SteelCutOptimizer.Server.Utils;
 using System.Text.Json;
 
 namespace SteelCutOptimizer.Server.Controllers
@@ -29,21 +29,20 @@ namespace SteelCutOptimizer.Server.Controllers
         [HttpPost]
         public IActionResult solve([FromBody] CuttingStockProblemDataDTO problemData)
         {
-            String tempDirectory = AppDomain.CurrentDomain.BaseDirectory + "data/multipleStockExtended/";
-            if(!Enum.TryParse(problemData.ProblemType, out CuttingStockProblemType problemType ))
-            {
-                return BadRequest("Invalid problem type");
-            }
-
-            var amplDataConverter = _amplDataConverterFactory.Create(problemType);
             try
             {
+                var settings = problemData.AlgorithmSettings;
+                UniqueID uniqueId = new UniqueID();
+                var amplDataConverter = _amplDataConverterFactory.Create(settings, uniqueId.Get());
+
                 amplDataConverter.AdjustEntryData(problemData);
-                amplDataConverter.ConvertToAmplDataFile(tempDirectory, problemData);
+                string dataFilePath = amplDataConverter.ConvertToAmplDataFile(problemData);
 
-                var amplApiService = _amplApiServiceFactory.Create(problemType);
-                AmplResult results = amplApiService.SolveCuttingStockProblem(tempDirectory);
 
+                var amplApiService = _amplApiServiceFactory.Create(settings);
+                AmplResult results = amplApiService.SolveCuttingStockProblem(dataFilePath);
+
+                amplDataConverter.DisposeDataFile();
                 amplDataConverter.ValidateResultData(results, problemData);
                 var dto = amplDataConverter.ConvertResultDataToDTO(results);
 
@@ -54,6 +53,10 @@ namespace SteelCutOptimizer.Server.Controllers
                 return BadRequest(exc.Message);
             }
             catch (InvalidDataException exc)
+            {
+                return BadRequest(exc.Message);
+            }
+            catch(NotImplementedException exc)
             {
                 return BadRequest(exc.Message);
             }

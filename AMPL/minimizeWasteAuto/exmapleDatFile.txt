@@ -1,0 +1,14 @@
+data;
+param: ORDERS: orderLengths  orderNum canBeRelaxed :=
+		1			200			60			1
+    	2			300			35			1
+    	3			375			24			1
+    	4			450			15			1
+    	5			500			10			1;
+	
+param: STOCK: stockLengths stockNum:=
+	1	1100 120
+	2	900 120
+	3   575 120;
+	
+param allowBasicPatterns := 1;

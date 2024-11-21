@@ -5,20 +5,11 @@ import {
     useMantineReactTable,
 } from 'mantine-react-table';
 import classes from "./PatternTable.module.css"
+import { ResultPattern } from "../../hooks/useSolveCuttingStockProblem"
 
-
-interface RelaxableLength {
-    length: number,
-    relaxAmount: number,
-}
-interface Pattern {
-    patternId: number;
-    count: number;
-    usedOrderLengths: RelaxableLength[], 
-}
 
 interface TableProps {
-    data: Pattern[];
+    data: ResultPattern[];
 }
 
 const PatternTable = ({ data }: TableProps) => {
@@ -27,9 +18,14 @@ const PatternTable = ({ data }: TableProps) => {
     const [isFetchingUsers] = useState<boolean>(false);
     const [isSaving] = useState<boolean>(false);
 
-    const columns = useMemo<MRT_ColumnDef<Pattern>[]>(
+    const displayedData = useMemo<ResultPattern[]>(() => {
+        return [...data.filter(pattern => pattern.count > 0)];
+        //return data;
+    }, [data]);
+
+    const columns = useMemo<MRT_ColumnDef<ResultPattern>[]>(
         () => {
-            const result: MRT_ColumnDef<Pattern>[] = [
+            const result: MRT_ColumnDef<ResultPattern>[] = [
                 {
                     accessorKey: 'patternId',
                     header: 'Pattern ID',
@@ -47,29 +43,29 @@ const PatternTable = ({ data }: TableProps) => {
                 },
             ];
 
-            if (!data || data.length === 0)
+            if (!displayedData || displayedData.length === 0)
                 return result;
 
             let idxOfDataWithMostBars = 0;
             let maxBarNum = 0;
-            for (let i = 0; i < data.length; ++i) {
-                if (data[i].usedOrderLengths.length > maxBarNum) {
-                    maxBarNum = data[i].usedOrderLengths.length;
+            for (let i = 0; i < displayedData.length; ++i) {
+                if (displayedData[i].segmentList.length > maxBarNum) {
+                    maxBarNum = displayedData[i].segmentList.length;
                     idxOfDataWithMostBars = i;
                 }
             }
 
             let tempIdx = 0;
-            data[idxOfDataWithMostBars].usedOrderLengths.forEach(() => {
+            displayedData[idxOfDataWithMostBars].segmentList.forEach(() => {
                 const idx = tempIdx;
                 result.push({
                     id: idx.toString(),
-                    accessorFn: (row: Pattern) => {
-                        if (row.usedOrderLengths.length > idx) {
-                            if (row.usedOrderLengths[idx].relaxAmount !== 0)
-                                return `${row.usedOrderLengths[idx].length} (+${row.usedOrderLengths[idx].relaxAmount})`;
+                    accessorFn: (row: ResultPattern) => {
+                        if (row.segmentList.length > idx) {
+                            if (row.segmentList[idx].relaxAmount !== 0)
+                                return `${row.segmentList[idx].length} (+${row.segmentList[idx].relaxAmount})`;
                             else
-                                return `${row.usedOrderLengths[idx].length}`;
+                                return `${row.segmentList[idx].length}`;
                         }
                         else
                             return '';
@@ -84,12 +80,12 @@ const PatternTable = ({ data }: TableProps) => {
 
             return result;
         },
-        [data],
+        [displayedData],
     );
 
     const table = useMantineReactTable({
         columns,
-        data: data,
+        data: displayedData,
         createDisplayMode: 'row',
         editDisplayMode: 'table',
         enableColumnResizing: true,

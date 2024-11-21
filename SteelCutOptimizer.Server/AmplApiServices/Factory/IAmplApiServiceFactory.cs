@@ -1,9 +1,9 @@
-﻿using SteelCutOptimizer.Server.Enums;
+﻿using SteelCutOptimizer.Server.Structs;
 
 namespace SteelCutOptimizer.Server.AmplApiServices
 {
     public interface IAmplApiServiceFactory
     {
-        public IAmplApiService Create( CuttingStockProblemType problemType );
+        public IAmplApiService Create( AlgorithmSettings settings );
     }
 }

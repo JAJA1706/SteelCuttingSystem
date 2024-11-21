@@ -1,0 +1,100 @@
+option solver cbc;
+option solution_round 6;
+
+#model .../cut.mod;
+#data .../cut.dat;
+
+problem Cutting_Opt: usedPatterns, Waste, FillOrder, StockLimit;
+   option relax_integrality 1;
+   option presolve 0;
+
+problem Pattern_Gen_Relax: Use, Relax, ReducedCost, LengthLimit, RelaxLimit, IsRelaxationAllowed;
+   option relax_integrality 0;
+   option presolve 1;
+
+for {i in STOCK}
+{
+	let nPAT[i] := 0;
+}
+
+param temp;
+for {i in STOCK}
+{
+	for{ x in ORDERS}
+	{
+		let temp := floor(stockLengths[i] / orderLengths[x]);
+		if temp > 0 then
+		{
+			let nPAT[i] := nPAT[i] + 1;
+			let lfep[i,x,nPAT[i]] := temp;
+			let {x2 in ORDERS: x2 <> x} lfep[i,x2,nPAT[i]] := 0;
+			let {x2 in ORDERS} rfep[i,x2,nPAT[i]] := 0;
+		}
+	}
+};
+
+param tempRelax;
+param minRelaxCost;
+param isFeasible;
+let isFeasible := 1;
+param isNewPattern;
+repeat
+{
+	solve Cutting_Opt;
+	let {x in ORDERS} price[x] := FillOrder[x].dual;
+	
+	let isNewPattern := 0;
+	for{i in STOCK}
+	{
+	
+		for {x in ORDERS}
+		{
+			let tempRelax := ceil(stockLengths[i]/orderLengths[x]) * orderLengths[x] - stockLengths[i];
+			let minRelaxCost := price[x] / orderLengths[x]; #values lower and equal to this will yield results with infinite relaxation
+			if tempRelax = 0 or allowBasicPatterns = 1 then
+			{
+				let relaxCost[x] := minRelaxCost + 0.01;
+			}
+			else
+			{
+				
+				let relaxCost[x] := StockLimit[i]/tempRelax + (price[x]*tempRelax + stockLengths[i]*price[x])/(orderLengths[x]*tempRelax) + 0.01; #values lower than this will allow patterns with only one type of orderLength
+				if relaxCost[x] <= minRelaxCost then
+				{
+					let relaxCost[x] := minRelaxCost + 0.01;
+				}
+			}
+		};
+	
+		let stockLength := stockLengths[i];
+		solve Pattern_Gen_Relax;
+		
+		if ReducedCost - StockLimit[i] < -0.00001 then
+		{
+			let nPAT[i] := nPAT[i] + 1;
+			let {x in ORDERS} lfep[i,x,nPAT[i]] := Use[x];
+			let {x in ORDERS} rfep[i,x,nPAT[i]] := Relax[x];
+			let isNewPattern := 1;
+		}
+	};
+
+	if isNewPattern = 0 then
+	{
+		if allowBasicPatterns = 1 then
+		{
+			break;
+		}
+		let allowBasicPatterns := 1; #allow looking for a basic patterns (patterns with one type of orderLength)
+	}
+		
+};
+
+
+option Cutting_Opt.relax_integrality 0;
+option Cutting_Opt.presolve 10;
+solve Cutting_Opt;
+
+if solve_result == "infeasible" or solve_result_num == 200 then 
+{
+	let isFeasible := 0;
+}

@@ -63,7 +63,6 @@ const DynamicTableOrder = ({ dataRef, algorithmSettings }: DynamicTableOrderProp
                 item.id === row.id ? { ...item, canBeRelaxed: e.currentTarget.checked } : item
             )
         );
-
     };
 
     const columns = useMemo<MRT_ColumnDef<Order>[]>(
@@ -140,20 +139,24 @@ const DynamicTableOrder = ({ dataRef, algorithmSettings }: DynamicTableOrderProp
                             event.target.select();
                         },
                         onBlur: (event) => {
-                            const value = event.currentTarget.value;
-                            if (value === '')
-                                return;
-
-                            const validationError = !validatePositiveNumber(value)
-                                ? 'Positive number required'
-                                : undefined;
-                            setValidationErrors({
-                                ...validationErrors,
-                                [cell.id]: validationError,
-                            });
+                            let value: string | number | undefined = event.currentTarget.value;
+                            if (value !== '') {
+                                const validationError = !validatePositiveNumber(value)
+                                    ? 'Positive number required'
+                                    : undefined;
+                                setValidationErrors({
+                                    ...validationErrors,
+                                    [cell.id]: validationError,
+                                });
+                                value = parseInt(value);
+                            }
+                            else {
+                                value = undefined;
+                            }
+                            
                             setData((prevData) =>
                                 prevData.map((item) =>
-                                    item.id === row.id ? { ...item, maxRelax: parseInt(value) } : item
+                                    item.id === row.id ? { ...item, maxRelax: value } : item
                                 )
                             );
                         },

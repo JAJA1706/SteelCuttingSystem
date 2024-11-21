@@ -1,14 +1,16 @@
-import { useMemo, useState, useEffect, MutableRefObject, useCallback } from 'react';
-import { type MRT_ColumnDef } from 'mantine-react-table';
+import { useMemo, useState, useEffect, MutableRefObject, useCallback, useRef } from 'react';
+import { MRT_Row, type MRT_ColumnDef } from 'mantine-react-table';
 import { v4 as uuidv4 } from 'uuid';
 import useResetStore from "../../hooks/useResetStore"
 import useStockStore from "../../hooks/useStockStore"
 import { useShallow } from 'zustand/react/shallow';
 import DynamicTable, { BaseData } from './DynamicTable';
 import { Settings } from '../SettingsPanel/SettingsPanel';
+import { Radio } from "@mantine/core";
 
 export interface Stock extends BaseData {
     cost: number | undefined;
+    nextStepGeneration: boolean;
 }
 
 interface DynamicTableStockProps {
@@ -21,8 +23,8 @@ const DynamicTableStock = ({ dataRef, algorithmSettings }: DynamicTableStockProp
         Record<string, string | undefined>
     >({});
 
+    const radioChecked = useRef<string | undefined>();
     const [data, setData] = useState<Stock[]>([]);
-
     const setResetStockDataFunction = useResetStore(state => state.setResetStockDataFunction);
     const setStockDataFunctions = useStockStore(useShallow((state) => ({ get: state.setGetStockDataFunction, set: state.setSetStockDataFunction })));
 
@@ -47,7 +49,20 @@ const DynamicTableStock = ({ dataRef, algorithmSettings }: DynamicTableStockProp
     useEffect(() => {
         if (dataRef !== undefined)
             dataRef.current = data;
+
+        const row = data.find(row => row.nextStepGeneration === true);
+        radioChecked.current = row?.id;
+        
     }, [data, dataRef])
+
+    const onCheckboxChange = (row: MRT_Row<Stock>) => {
+        radioChecked.current = row.id;
+        setData((prevData) =>
+            prevData.map((item) =>
+                item.id === row.id ? { ...item, nextStepGeneration: true } : { ...item, nextStepGeneration: false }
+            )
+        );
+    };
 
     const columns = useMemo<MRT_ColumnDef<Stock>[]>(
         () => {
@@ -93,20 +108,24 @@ const DynamicTableStock = ({ dataRef, algorithmSettings }: DynamicTableStockProp
                         event.target.select();
                     },
                     onBlur: (event) => {
-                        const value = event.currentTarget.value;
-                        if (value === '')
-                            return;
+                        let value: string | number | undefined = event.currentTarget.value;
+                        if (value !== '') {
+                            const validationError = !validatePositiveNumber(value)
+                                ? 'Positive number required'
+                                : undefined;
+                            setValidationErrors({
+                                ...validationErrors,
+                                [cell.id]: validationError,
+                            });
+                            value = parseInt(value);
+                        }
+                        else {
+                            value = undefined;
+                        }
 
-                        const validationError = !validatePositiveNumber(value)
-                            ? 'Positive number required'
-                            : undefined;
-                        setValidationErrors({
-                            ...validationErrors,
-                            [cell.id]: validationError,
-                        });
                         setData((prevData) =>
                             prevData.map((item) =>
-                                item.id === row.id ? { ...item, count: parseInt(value) } : item
+                                item.id === row.id ? { ...item, count: value } : item
                             )
                         );
                     },
@@ -127,26 +146,47 @@ const DynamicTableStock = ({ dataRef, algorithmSettings }: DynamicTableStockProp
                             event.target.select();
                         },
                         onBlur: (event) => {
-                            const value = event.currentTarget.value;
-                            if (value === '')
-                                return;
+                            let value: string | number | undefined = event.currentTarget.value;
+                            if (value !== '') {
+                                const validationError = !validatePositiveNumber(value)
+                                    ? 'Positive number required'
+                                    : undefined;
+                                setValidationErrors({
+                                    ...validationErrors,
+                                    [cell.id]: validationError,
+                                });
+                                value = parseInt(value);
+                            }
+                            else {
+                                value = undefined;
+                            }
 
-                            const validationError = !validatePositiveNumber(value)
-                                ? 'Positive number required'
-                                : undefined;
-                            setValidationErrors({
-                                ...validationErrors,
-                                [cell.id]: validationError,
-                            });
                             setData((prevData) =>
                                 prevData.map((item) =>
-                                    item.id === row.id ? { ...item, cost: parseInt(value) } : item
+                                    item.id === row.id ? { ...item, cost: value } : item
                                 )
                             );
                         },
                     }),
                 });
             }
+
+            if (algorithmSettings.relaxationType === "singleStep") {
+                columnsDef.push({
+                    accessorKey: 'generate',
+                    header: 'Generate next step',
+                    size: 80,
+                    enableColumnFilter: false,
+                    enableSorting: false,
+                    Edit: ({ row }) => (
+                        <Radio
+                            checked={radioChecked.current === row.id}
+                            onChange={() => onCheckboxChange(row)}
+                        />
+                    ),
+                })
+            }
+
             return columnsDef;
         },
         [validationErrors, algorithmSettings],

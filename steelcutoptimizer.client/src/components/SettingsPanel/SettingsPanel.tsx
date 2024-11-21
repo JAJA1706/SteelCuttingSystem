@@ -32,6 +32,7 @@ const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
 
     return (
         <div className={classes.panelLayout}>
+            <Text fw={700}>Algorithm Settings</Text>
             <div className={classes.buttonLayout}>
                 <Radio.Group
                     value={settings.mainObjective}
@@ -71,8 +72,8 @@ const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
             <Divider />
             <div className={classes.textArea}>
                 <Text fw={700}>Algorithm Description</Text>
-                <Text> Ten algorytm robi takie rzeczy że ludziom się nie śniły. Największe mocarstwa nękaja mnie żebym podesłał im szczegóły tego zajebiście dowalonego w kosmos algorytmu mocy.
-                    Użycie go co najmniej pozwala zawładnąć światem, a co najwyżej całkowicie go zniszczyć. Zastanów się dobrze przed kliknięciem "generuj".</Text>
+                <Text> Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+                </Text>
             </div>
         </div>
     )

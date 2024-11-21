@@ -37,6 +37,7 @@ const FileImportPopup = ({ closePopup }: FileImportPopupProps) => {
         if (importedData.stockData !== undefined)
             setStockData(importedData.stockData);
 
+
         if (importedData.orderData !== undefined)
             setOrderData(importedData.orderData);
 

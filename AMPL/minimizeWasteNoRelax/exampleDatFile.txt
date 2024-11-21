@@ -1,0 +1,12 @@
+data;
+param: ORDERS: orderLengths  orderNum :=
+	1	200		60
+    2	300		35
+    3	375		24
+    4	450		15
+    5	500		10;
+	
+param: STOCK: stockLengths stockNum:=
+	1	1100 10
+	2	900 14
+	3   575 80;
