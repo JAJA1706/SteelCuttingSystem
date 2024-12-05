@@ -73,7 +73,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                 throw new InvalidDataException("Order list cannot be empty");
 
             fileContent.AppendLine("data;");
-            if (settings.RelaxationType == "manual")
+            if (settings.RelaxationType == "manual" || settings.RelaxationType == "manualFast")
             {
                 fileContent.AppendLine("param: ORDERS: orderLengths  orderNum  maxRelax :=");
                 foreach (var order in data.OrderList)
@@ -246,7 +246,8 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
 
         private bool isFastVersionSuitable(CuttingStockProblemDataDTO data)
         {
-            if (data.StockList!.Any(o => o.Count != Int32.MaxValue))
+            if (settings.RelaxationType != "manualFast" ||
+                data.StockList!.Any(o => o.Count != Int32.MaxValue))
                 return false;
 
             return true;

@@ -80,11 +80,12 @@ repeat
 
 	if isNewPattern = 0 then
 	{
-		if allowBasicPatterns = 1 then
-		{
-			break;
-		}
-		let allowBasicPatterns := 1; #allow looking for a basic patterns (patterns with one type of orderLength)
+		#if allowBasicPatterns = 1 then
+		#{
+		#	break;
+		#}
+		#let allowBasicPatterns := 1; #allow looking for a basic patterns (patterns with one type of orderLength)
+		break;
 	}
 		
 };

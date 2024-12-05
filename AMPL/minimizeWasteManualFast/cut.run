@@ -75,3 +75,10 @@ repeat
 option Cutting_Opt.relax_integrality 0;
 option Cutting_Opt.presolve 10;
 solve Cutting_Opt;
+
+param isFeasible;
+let isFeasible := 1;
+if solve_result == "infeasible" or solve_result_num == 200 then 
+{
+	let isFeasible := 0;
+}

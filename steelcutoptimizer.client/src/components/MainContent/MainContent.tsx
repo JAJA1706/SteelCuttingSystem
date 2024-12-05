@@ -45,7 +45,7 @@ const MainContent = () => {
             orderList: [...orderDataRef.current],
         };
 
-        if (algorithmSettings.mainObjective === "waste") {
+        if (algorithmSettings.mainObjective === "waste" && algorithmSettings.relaxationType === "manual") {
             if (!stockDataRef.current.some(stock => !!stock.count))
                 requestBody.algorithmSettings.relaxationType = "manualFast";
         }

@@ -8,5 +8,5 @@ param: ORDERS: orderLengths  orderNum :=
     6	500		10;
 	
 param: STOCK: stockLengths stockNum stockCost :=
-	1	1200 100 12
-	2	1000 100 10
+	1	1200 4 1
+	2	1000 100 1
