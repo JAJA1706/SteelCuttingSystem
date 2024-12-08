@@ -223,6 +223,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                     fileContent.Append($"[{stockIdx}] {patternCountForStockItem[stockIdx]}, ");
                 }
                 fileContent.Replace(",", ";", fileContent.Length - 2, 1);
+                fileContent.AppendLine();
             }
 
             if(data.OrderPrices != null && data.OrderPrices.Count > 0)

@@ -1,45 +1,44 @@
 # ----------------------------------------
-# CUTTING STOCK USING PATTERNS (Waste, Auto)
+# CUTTING STOCK USING PATTERNS (Waste, Fast)
+# This model is considered fast because we only need 1 iteration of knapsack subproblem.
+# This version includes constraint StockLimit.
 # ----------------------------------------
 set STOCK;
 param stockLengths {STOCK} > 0;        			# length of raw bars [.dat]
-param stockNum {STOCK} > 0;						# limit of used raw bars [.dat]
+param stockNum {STOCK} > 0;
 set ORDERS;                   					# set of orderLengths to be cut [.dat]
 param orderLengths {ORDERS} > 0;				# length of ordered bars [.dat]
 param orderNum {ORDERS} > 0;    				# number of each width to be cut [.dat]
-param canBeRelaxed {ORDERS} default 0;			# can we relax this length [.dat]
+param maxRelax {ORDERS} >= 0;
 
 param nPAT {STOCK} integer >= 0;      								# number of patterns for each STOCK
 set PATTERNS {i in STOCK} := 1..nPAT[i];      						# set of patterns in Stock
-param lfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;			# orderLengths for each pattern
-param rfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;			# relax for each pattern               
+param lfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;			# orderLengths for each pattern   
+param rfep {i in STOCK,ORDERS,PATTERNS[i]} integer >= 0;			# relax for each pattern                        		           
 var usedPatterns {i in STOCK, PATTERNS[i]} integer >= 0; 			# how many patterns of each type
 				                            
 minimize Waste:
-	sum {i in STOCK, j in PATTERNS[i]} (stockLengths[i] - sum{x in ORDERS} (lfep[i,x,j] * orderLengths[x] - rfep[i,x,j])) * usedPatterns[i,j];
+	sum {i in STOCK, j in PATTERNS[i]} (stockLengths[i] - (sum{x in ORDERS} (lfep[i,x,j] * orderLengths[x] - rfep[i,x,j]))) * usedPatterns[i,j];
 subj to FillOrder {x in ORDERS}:
 	sum {i in STOCK, j in PATTERNS[i]} lfep[i,x,j] * usedPatterns[i,j] >= orderNum[x];
 subj to StockLimit {i in STOCK}:
 	sum{ j in PATTERNS[i]} usedPatterns[i,j] <= stockNum[i];
    
 # ----------------------------------------
-# KNAPSACK SUBPROBLEM AUTO RELAX
+# KNAPSACK SUBPROBLEM
 # ----------------------------------------
+param relaxCost default 0.01;
 param price {ORDERS} default 0.0;
-param stockLength default 0;
-param relaxCost {ORDERS} default 0.00001;
+param stockLimit {STOCK} default 0.0;
 var Use {ORDERS} integer >= 0;
 var Relax {ORDERS} integer >= 0;
+var StockUse {STOCK} integer >= 0;
 	
 minimize ReducedCost:
-   stockLength - sum{x in ORDERS}(orderLengths[x] * Use[x] - Relax[x] + price[x]*Use[x] - Relax[x]*relaxCost[x]);
+	sum {i in STOCK} (stockLengths[i] - stockLimit[i]) * StockUse[i] - sum{x in ORDERS}(orderLengths[x] * Use[x] - Relax[x] + price[x]*Use[x] - Relax[x]*relaxCost);
 subj to LengthLimit:
-   sum {x in ORDERS} (orderLengths[x] * Use[x] - Relax[x]) <= stockLength;
-subj to RelaxLimit {x in ORDERS}: #bar length cannot be shorter than 1
-	(orderLengths[x]-1) * Use[x] >= Relax[x];
-subj to IsRelaxationAllowed {x in ORDERS}:
-	Relax[x] = Relax[x] * canBeRelaxed[x];
-	
-	
-#additional params for cut.run
-param allowBasicPatterns default 0;
+   sum {x in ORDERS} (orderLengths[x] * Use[x] - Relax[x]) <= sum {i in STOCK} stockLengths[i] * StockUse[i];
+subj to OneStock:
+	sum {i in STOCK} StockUse[i] = 1;
+subj to MaxRelax {x in ORDERS}:
+	Relax[x] <= maxRelax[x] * Use[x];

@@ -1,7 +1,6 @@
 # ----------------------------------------
 # CUTTING STOCK USING PATTERNS (Waste, Fast)
 # This model is considered fast because we only need 1 iteration of knapsack subproblem.
-# It is applicable only if we do not have to worry about stockCost nor stockLimit.
 # ----------------------------------------
 set STOCK;
 param stockLengths {STOCK} > 0;        			# length of raw bars [.dat]

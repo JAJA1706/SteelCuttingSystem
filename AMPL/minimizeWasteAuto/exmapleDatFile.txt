@@ -11,4 +11,4 @@ param: STOCK: stockLengths stockNum:=
 	2	900 120
 	3   575 120;
 	
-param allowBasicPatterns := 1;
+param allowBasicPatterns := 0;
