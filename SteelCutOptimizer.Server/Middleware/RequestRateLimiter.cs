@@ -24,7 +24,7 @@ namespace SteelCutOptimizer.Server.Middleware
                 if (_clients.ContainsKey(clientIP))
                 {
                     var lastRequestTime = _clients[clientIP];
-                    if ((currentTime - lastRequestTime).TotalMilliseconds < 500)
+                    if ((currentTime - lastRequestTime).TotalMilliseconds < 250)
                     {
                         context.Response.StatusCode = 429;
                         context.Response.Body.WriteAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes("Too many requests")));

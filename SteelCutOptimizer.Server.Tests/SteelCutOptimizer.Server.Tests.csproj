@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <Configurations>Debug;Release;EfficiencyTests</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EfficiencyTests|AnyCPU'">
+    <DefineConstants>$(DefineConstants);TestEfficiency</DefineConstants>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SteelCutOptimizer.Server\SteelCutOptimizer.Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="xcopy $(ProjectDir)..\SteelCutOptimizer.Server\lib\* $(ProjectDir)$(OutDir) /D /y&#xD;&#xA;xcopy $(ProjectDir)..\SteelCutOptimizer.Server\lib\dotnet\ampl-dotnet-native.dll $(ProjectDir)$(OutDir) /D /y&#xD;&#xA;xcopy $(ProjectDir)..\AMPL\* $(ProjectDir)$(OutDir)AmplModels\ /E /I /D /y" />
+  </Target>
+
+</Project>

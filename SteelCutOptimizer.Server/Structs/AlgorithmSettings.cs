@@ -4,5 +4,13 @@
     {
         public string MainObjective { get; set; } = "cost";
         public string RelaxationType { get; set; } = "manual";
+
+
+        public AlgorithmSettings() { }
+        public AlgorithmSettings(AlgorithmSettings copyObj) 
+        {
+            MainObjective = copyObj.MainObjective;
+            RelaxationType = copyObj.RelaxationType;
+        }
     }
 }
