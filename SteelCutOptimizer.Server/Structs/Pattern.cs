@@ -22,5 +22,16 @@
             UseCount = useCount;
             SegmentList.AddRange(listOfSegments);
         }
+
+        public Pattern(Pattern copyObj)
+        {
+            if (copyObj == null)
+                throw new ArgumentNullException();
+
+            StockId = copyObj.StockId;
+            StockLength = copyObj.StockLength;
+            UseCount = copyObj.UseCount;
+            SegmentList = copyObj.SegmentList.Select(segment => new Segment(segment)).ToList();
+        }
     }
 }

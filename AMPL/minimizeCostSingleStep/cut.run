@@ -1,4 +1,5 @@
-option solver cbc;
+#option solver cbc;
+#option cbc_options 'timelimit=240';
 option solution_round 6;
 
 #model .../cut.mod;
@@ -12,10 +13,12 @@ problem Relaxed_Pattern_Gen: Use, Relax, RelaxSum, PatternCost, LengthLimitR, Re
 	option relax_integrality 0;
 	option presolve 1;
 
+
 param isFeasible;
 param i := stockItemToRelax;
+param numericTolerance := stockCost[i]/10000;
 let isFeasible := 1;
-let minNewPatternCost := 0.0001 + stockCost[i] - prevStockLimit[i];
+let minNewPatternCost := numericTolerance + stockCost[i] - prevStockLimit[i];
 let rawBarLength := stockLengths[i];
 solve Relaxed_Pattern_Gen;
 

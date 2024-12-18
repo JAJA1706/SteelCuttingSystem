@@ -13,15 +13,19 @@ namespace SteelCutOptimizer.Server.DTO
         public List<double>? OrderPrices { get; set; } //used only in singleStep mode
         public List<double>? StockLimits { get; set; } //used only in singleStep mode
 
+        public CuttingStockProblemDataDTO(){}
         public CuttingStockProblemDataDTO(CuttingStockProblemDataDTO copyObj)
         {
+            if (copyObj == null)
+                throw new ArgumentNullException();
+
             AlgorithmSettings = new AlgorithmSettings(copyObj.AlgorithmSettings);
-            StockList = new List<StockItem>(copyObj.StockList ?? []);
-            OrderList = new List<OrderItem>(copyObj.OrderList ?? []);
-            Patterns = new List<Pattern>(copyObj.Patterns ?? []);
+            StockList = copyObj.StockList?.Select(item => new StockItem(item)).ToList();
+            OrderList = copyObj.OrderList?.Select(item => new OrderItem(item)).ToList();
+            Patterns = copyObj.Patterns?.Select(pattern => new Pattern(pattern)).ToList();
             AreBasicPatternsAllowed = copyObj.AreBasicPatternsAllowed;
-            OrderPrices = new List<double>(copyObj.OrderPrices ?? []);
-            StockLimits = new List<double>(copyObj.StockLimits ?? []);
+            OrderPrices = copyObj.OrderPrices?.ToList();
+            StockLimits = copyObj.StockLimits?.ToList();
         }
     }
 }

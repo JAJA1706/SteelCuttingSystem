@@ -42,18 +42,18 @@ export default function LayoutWithHeaderSidebar() {
             padding="md"
         >
             <AppShell.Header bg='blue.1'>
-                <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" h="100%" px="md" />
                 <Group h="100%" ml="xs" justify="space-between">
-                    <Group h="100%" ml="xs" gap={5} visibleFrom="sm" justify="flex-start" mr={10}>
+                    <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" h="100%" px="md" />
+                    <Group h="100%" ml={10} gap={10} visibleFrom="sm" justify="flex-start">
+                        <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button} onClick={onNewPlanClick}>New Plan</Button>
+                        <Button variant="subtle" leftSection={<IconDownload />} className={classes.button} onClick={openFileInputModal}>Import Plan</Button>
+                        <Button variant="subtle" leftSection={<IconUpload />} className={classes.button} onClick={onDownloadPlanClick}>Download Plan</Button>
+                    </Group>
+                    <Group h="100%" ml="xs" gap={5} justify="flex-end" mr={10}>
                         <Image src={logo} h={60} />
                         <Text className={classes.text}>
                             Steel Cutting System
                         </Text>
-                    </Group>
-                    <Group h="100%" ml="xl" gap={10} visibleFrom="sm" justify="flex-end" mr={10}>
-                        <Button variant="subtle" leftSection={<IconRefresh />} className={classes.button} onClick={onNewPlanClick}>New Plan</Button>
-                        <Button variant="subtle" leftSection={<IconDownload />} className={classes.button} onClick={openFileInputModal}>Import Plan</Button>
-                        <Button variant="subtle" leftSection={<IconUpload />} className={classes.button} onClick={onDownloadPlanClick}>Download Plan</Button>
                     </Group>
                 </Group>
             </AppShell.Header>

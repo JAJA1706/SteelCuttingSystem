@@ -1,4 +1,5 @@
-option solver cbc;
+#option solver cbc;
+#option cbc_options 'timelimit=240';
 option solution_round 6;
 
 #model .../cut.mod;
@@ -16,7 +17,7 @@ problem Pattern_Gen_Relax: Use, Relax, RelaxSum, PatternCost, LengthLimit, Relax
 param isFeasible;
 param i := stockItemToRelax;
 let isFeasible := 1;
-let minNewPatternCost :=  prevStockLimit[i] - 0.0001;
+let minNewPatternCost :=  prevStockLimit[i] - 0.1;
 let stockLength := stockLengths[i];
 solve Pattern_Gen_Relax;
 

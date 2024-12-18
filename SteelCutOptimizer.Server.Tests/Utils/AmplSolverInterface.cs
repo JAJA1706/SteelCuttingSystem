@@ -8,40 +8,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SteelCutOptimizer.Server.Utils;
-using SteelCutOptimizer.Server.AmplApiServices;
-using SteelCutOptimizer.Server.AmplDataConverters;
+using SteelCutOptimizer.Server.AMPLInstruments;
 
 namespace SteelCutOptimizer.Server.Tests.Utils
 {
     internal class AmplSolverInterface
     {
-        private readonly AmplDataConverterFactory _amplDataConverterFactory = new AmplDataConverterFactory();
-        private readonly AmplApiServiceFactory _amplApiServiceFactory = new AmplApiServiceFactory();
+        private readonly AmplInstrumentsFactory _amplInstrumentFactory = new AmplInstrumentsFactory();
+        private AmplResult? lastResult;
 
         public TestResult SolveWithAMPL(CuttingStockProblemDataDTO problemData)
         {
             var settings = problemData.AlgorithmSettings;
             UniqueID uniqueId = new UniqueID();
-            var amplDataConverter = _amplDataConverterFactory.Create(settings, uniqueId.Get());
+            var amplDataConverter = _amplInstrumentFactory.CreateConverter(settings, uniqueId.Get());
+            var amplDataValidator = _amplInstrumentFactory.CreateValidator(settings);
 
             amplDataConverter.AdjustEntryData(problemData);
             string dataFilePath = amplDataConverter.ConvertToAmplDataFile(problemData);
 
-            var amplApiService = _amplApiServiceFactory.Create(settings);
+            var amplApiService = _amplInstrumentFactory.CreateApiService(settings);
 
             Stopwatch sw = Stopwatch.StartNew();
             AmplResult amplResults = amplApiService.SolveCuttingStockProblem(dataFilePath);
+            lastResult = amplResults;
             sw.Stop();
 
             amplDataConverter.DisposeDataFile();
-            amplDataConverter.ValidateResultData(amplResults, problemData);
+            amplDataValidator.ValidateResultData(amplResults, problemData);
 
             TestResult testResult = new();
             testResult.Time = sw.ElapsedMilliseconds;
-            testResult.ObtainedValue = (int)amplResults.TotalCost!;
+            if(amplResults.TotalCost != null)
+                testResult.ObtainedValue = (int)amplResults.TotalCost;
+            else if(amplResults.TotalWaste != null)
+                testResult.ObtainedValue = (int)amplResults.TotalWaste!;
+
             testResult.ProblemSize = problemData.OrderList!.Aggregate(0, (x, next) => x + next.Count, sumOfItems => sumOfItems);
 
             return testResult;
+        }
+
+        public AmplResult? GetLastResult()
+        {
+            return lastResult;
         }
     }
 }

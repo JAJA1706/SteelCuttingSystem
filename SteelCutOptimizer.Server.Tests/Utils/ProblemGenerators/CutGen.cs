@@ -17,12 +17,6 @@ using SteelCutOptimizer.Server.Tests.Structs;
 
 namespace SteelCutOptimizer.Server.Tests.Utils
 {
-    public class Problem
-    {
-        public List<OrderItem>? Orders;
-        public int StockLength;
-    }
-
     public class Cutgen
     {
         private Random rGen;
@@ -34,29 +28,54 @@ namespace SteelCutOptimizer.Server.Tests.Utils
 
         public CuttingStockProblemDataDTO GenerateProblem(ProblemGenerationDefinition problemDef)
         {
-            int[] lengths = generateLengths(problemDef);
-            int[] demands = generateDemands(problemDef);
-
-            var cutgenProblem = merge(lengths, demands);
-
             CuttingStockProblemDataDTO result = new();
-            result.OrderList = cutgenProblem.Orders;
             result.StockList = new List<StockItem>();
-            result.StockList.Add(new StockItem { Length = problemDef.StockLength, Cost = problemDef.StockLength });
+            result.OrderList = new List<OrderItem>();
+
+            //single stock item
+            if (problemDef.StockCount == null && problemDef.StockLength != null)
+            {
+                int[] lengths = generateLengths(problemDef.OrderCount, problemDef.OrderLengthLowerBound, problemDef.OrderLengthUpperBound, (int)problemDef.StockLength);
+                int[] demands = generateDemands(problemDef.OrderCount, problemDef.AverageDemand);
+                var orders = merge(lengths, demands);
+                result.OrderList.AddRange(orders);
+                result.StockList.Add(new StockItem { Length = (int)problemDef.StockLength, Cost = problemDef.StockLength });
+            }
+            //multiple stock items
+            else if(problemDef.StockCount != null && problemDef.StockLengthLowerBound != null && problemDef.StockLengthUpperBound != null && problemDef.StockLength == null)
+            {
+                Dictionary<int, OrderItem> orderMap = new();
+                List<int> orderSize = divideOrdersBetweenStockItems(problemDef.OrderCount, (int)problemDef.StockCount);
+                for(int i = 0; i < problemDef.StockCount; i++)
+                {
+                    int stockLength = rGen.Next((int)problemDef.StockLengthLowerBound, (int)problemDef.StockLengthUpperBound + 1);
+                    int[] lengths = generateLengths(orderSize[i], problemDef.OrderLengthLowerBound, problemDef.OrderLengthUpperBound, stockLength);
+                    int[] demands = generateDemands(orderSize[i], problemDef.AverageDemand);
+                    var orders = merge(lengths, demands);
+                    foreach( var item in orders)
+                    {
+                        if (orderMap.ContainsKey(item.Length))
+                            orderMap[item.Length].Count += item.Count;
+                        else
+                            orderMap[item.Length] = new OrderItem { Length = item.Length, Count = item.Count };
+                    }
+                    result.StockList.Add(new StockItem { Length = stockLength, Cost = stockLength });
+                }
+                var uniqueOrders = orderMap.Values.ToList();
+                result.OrderList.AddRange(uniqueOrders);
+            }
 
             return result;
         }
 
-        private int[] generateLengths(ProblemGenerationDefinition problemDef)
+        private int[] generateLengths(int size, double lowerb, double upperb, int stockLength)
         {
-            int[] result = new int[problemDef.Size];
+            int[] result = new int[size];
 
-            double lb = problemDef.OrderLengthLowerBound;
-            double ub = problemDef.OrderLengthUpperBound;
             for (int i = 0; i < result.Length; i++)
             {
                 double rValue = rGen.NextDouble();
-                double length = (lb + (ub - lb) * rValue) * problemDef.StockLength + rValue;
+                double length = (lowerb + (upperb - lowerb) * rValue) * stockLength + rValue;
 
                 result[i] = (int)length;
             }
@@ -66,19 +85,19 @@ namespace SteelCutOptimizer.Server.Tests.Utils
             return result;
         }
 
-        private int[] generateDemands(ProblemGenerationDefinition problemDef)
+        private int[] generateDemands(int size, int averageDemand)
         {
-            int[] result = new int[problemDef.Size];
+            int[] result = new int[size];
 
             double sum = 0;
-            double[] rands = new double[problemDef.Size];
+            double[] rands = new double[size];
             for (int i = 0; i < result.Length; i++)
             {
                 rands[i] = rGen.NextDouble();
                 sum += rands[i];
             }
 
-            int totalDemand = problemDef.AverageDemand * problemDef.Size;
+            int totalDemand = averageDemand * size;
             int rest = totalDemand;
             for (int i = 0; i < result.Length - 1; i++)
             {
@@ -93,16 +112,15 @@ namespace SteelCutOptimizer.Server.Tests.Utils
             return result;
         }
 
-        private Problem merge(int[] lengths, int[] demands)
+        private List<OrderItem> merge(int[] lengths, int[] demands)
         {
-            Problem problem = new Problem();
-            problem.Orders = new List<OrderItem>();
+            var orders = new List<OrderItem>();
             for (int i = 0; i < lengths.Length; i++)
             {
                 if (i == lengths.Length - 1 || lengths[i] != lengths[i + 1])
                 {
                     var order = new OrderItem { Length = lengths[i], Count = demands[i] };
-                    problem.Orders.Add(order);
+                    orders.Add(order);
                 }
                 else
                 {
@@ -110,7 +128,7 @@ namespace SteelCutOptimizer.Server.Tests.Utils
                 }
             }
 
-            return problem;
+            return orders;
         }
 
         public static void descendingSort(int[] a)
@@ -129,6 +147,21 @@ namespace SteelCutOptimizer.Server.Tests.Utils
                 left++;
                 right--;
             }
+        }
+
+        private List<int> divideOrdersBetweenStockItems(int orderCount, int stockCount)
+        {
+            List<int> result = new();
+            int avrCount = orderCount / stockCount;
+            result.AddRange(Enumerable.Repeat(avrCount, stockCount));
+
+            for(int i = 0; i < orderCount % stockCount; ++i)
+            {
+                int rIdx = rGen.Next(0, result.Count);
+                ++result[rIdx];
+            }
+
+            return result;
         }
 
     }

@@ -11,7 +11,5 @@ namespace SteelCutOptimizer.Server.Tests.Structs
         public long Time;
         public double ObtainedValue;
         public int ProblemSize;
-        public int? OptimalValue;
-
     }
 }

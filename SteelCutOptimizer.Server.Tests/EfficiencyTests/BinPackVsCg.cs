@@ -1,111 +1,21 @@
 using SteelCutOptimizer.Server.Structs;
-using SteelCutOptimizer.Server.AmplApiServices;
-using SteelCutOptimizer.Server.AmplDataConverters;
 using SteelCutOptimizer.Server.DTO;
 using SteelCutOptimizer.Server.Utils;
 using SteelCutOptimizer.Server.Tests.Utils;
 using System.Diagnostics;
 using SteelCutOptimizer.Server.Tests.Structs;
 using SteelCutOptimizer.Server.Tests.Attributes;
+using Xunit.Abstractions;
+using SteelCutOptimizer.Server.AMPLInstruments;
 
 namespace EfficiencyTests
 {
-    public class BinPackVsCg
+    public class BinPackVsCgTest
     {
-        [EfficiencyFact]
-        public void BinpackVSColumnGenerationRisingDemand()
+        private readonly ITestOutputHelper output;
+        public BinPackVsCgTest(ITestOutputHelper output)
         {
-            AmplSolverInterface amplSolver = new AmplSolverInterface();
-            Cutgen problemGen = new Cutgen();
-            const int TEST_ITERATIONS = 1;
-            const int BATCH_ITERATIONS = 1;
-
-            List<TestResult> amplTestResultList = new List<TestResult>();
-            List<TestResult> binpackTestResultList = new List<TestResult>();
-            for (int i = 1; i <= TEST_ITERATIONS; ++i)
-            {
-                TestResult averagedAmplResults = new TestResult();
-                TestResult averagedBinpackResults = new TestResult();
-                for (int j = 1; j <= BATCH_ITERATIONS; ++j)
-                {
-                    //arrange
-                    var def = new ProblemGenerationDefinition { Size = 10, StockLength = 1200, OrderLengthLowerBound = 0.3, OrderLengthUpperBound = 0.8, AverageDemand = 500 * i };
-                    CuttingStockProblemDataDTO problemData = problemGen.GenerateProblem(def);
-                    problemData.AlgorithmSettings.RelaxationType = "none";
-
-                    //act
-                    TestResult amplTestResults = amplSolver.SolveWithAMPL(problemData);
-                    TestResult binPackResults = BinPackSolver.SolveWithBinPack(problemData);
-
-                    //average data
-                    averagedAmplResults.Time += amplTestResults.Time / BATCH_ITERATIONS;
-                    averagedAmplResults.ObtainedValue += amplTestResults.ObtainedValue / BATCH_ITERATIONS;
-                    averagedAmplResults.ProblemSize = amplTestResults.ProblemSize;
-                    averagedBinpackResults.Time += binPackResults.Time / BATCH_ITERATIONS;
-                    averagedBinpackResults.ObtainedValue += binPackResults.ObtainedValue / BATCH_ITERATIONS;
-                    averagedBinpackResults.ProblemSize = binPackResults.ProblemSize;
-                }
-
-                amplTestResultList.Add(averagedAmplResults);
-                binpackTestResultList.Add(averagedBinpackResults);
-            }
-
-            //save to file
-            List<List<TestResult>> combinedResults = new List<List<TestResult>>
-            {
-                amplTestResultList,
-                binpackTestResultList
-            };
-            List<string> methodNames = new List<string> { "ampl", "binpack" };
-            TestResultSaver.SaveToCSVCombined(combinedResults, methodNames, "BpVsCgRisingDemand");
-        }
-
-        [EfficiencyFact]
-        public void BinpackVSColumnGenerationRisingSize()
-        {
-            AmplSolverInterface amplSolver = new AmplSolverInterface();
-            Cutgen problemGen = new Cutgen();
-            const int TEST_ITERATIONS = 1;
-            const int BATCH_ITERATIONS = 1;
-
-            List<TestResult> amplTestResultList = new List<TestResult>();
-            List<TestResult> binpackTestResultList = new List<TestResult>();
-            for (int i = 1; i <= TEST_ITERATIONS; ++i)
-            {
-                TestResult averagedAmplResults = new TestResult();
-                TestResult averagedBinpackResults = new TestResult();
-                for (int j = 1; j <= BATCH_ITERATIONS; ++j)
-                {
-                    //arrange
-                    var def = new ProblemGenerationDefinition { Size = 5 * i, StockLength = 1200, OrderLengthLowerBound = 0.3, OrderLengthUpperBound = 0.8, AverageDemand = 100 };
-                    CuttingStockProblemDataDTO problemData = problemGen.GenerateProblem(def);
-                    problemData.AlgorithmSettings.RelaxationType = "none";
-
-                    //act
-                    TestResult amplTestResults = amplSolver.SolveWithAMPL(problemData);
-                    TestResult binPackResults = BinPackSolver.SolveWithBinPack(problemData);
-
-                    //average data
-                    averagedAmplResults.Time += amplTestResults.Time / BATCH_ITERATIONS;
-                    averagedAmplResults.ObtainedValue += amplTestResults.ObtainedValue / BATCH_ITERATIONS;
-                    averagedAmplResults.ProblemSize = amplTestResults.ProblemSize;
-                    averagedBinpackResults.Time += binPackResults.Time / BATCH_ITERATIONS;
-                    averagedBinpackResults.ObtainedValue += binPackResults.ObtainedValue / BATCH_ITERATIONS;
-                    averagedBinpackResults.ProblemSize = binPackResults.ProblemSize;
-                }
-
-                amplTestResultList.Add(averagedAmplResults);
-                binpackTestResultList.Add(averagedBinpackResults);
-            }
-
-            //save to file
-            List<List<TestResult>> combinedResults = new List<List<TestResult>>
-            {
-                amplTestResultList,
-                binpackTestResultList
-            };
-            List<string> methodNames = new List<string> { "ampl", "binpack" };
-            TestResultSaver.SaveToCSVCombined(combinedResults, methodNames, "BpVsCgRisingSize");
+            this.output = output;
         }
 
         [EfficiencyFact]
@@ -113,8 +23,8 @@ namespace EfficiencyTests
         {
             AmplSolverInterface amplSolver = new AmplSolverInterface();
             Cutgen problemGen = new Cutgen();
-            const int TEST_ITERATIONS = 20;
-            const int BATCH_ITERATIONS = 4;
+            const int TEST_ITERATIONS = 1; //20
+            const int BATCH_ITERATIONS = 1; //4
 
             List<TestResult> amplTestResultList = new List<TestResult>();
             List<TestResult> binpackTestResultList = new List<TestResult>();
@@ -129,7 +39,7 @@ namespace EfficiencyTests
                 for (int j = 1; j <= BATCH_ITERATIONS; ++j)
                 {
                     //arrange
-                    var def = new ProblemGenerationDefinition { Size = 10, StockLength = 1200, OrderLengthLowerBound = 0.3, OrderLengthUpperBound = 0.8, AverageDemand = 500 * i };
+                    var def = new ProblemGenerationDefinition { OrderCount = 10, StockLength = 1200, OrderLengthLowerBound = 0.2, OrderLengthUpperBound = 0.8, AverageDemand = 500 * i };
                     CuttingStockProblemDataDTO problemData = problemGen.GenerateProblem(def);
                     problemData.AlgorithmSettings.RelaxationType = "none";
 
@@ -180,8 +90,8 @@ namespace EfficiencyTests
         {
             AmplSolverInterface amplSolver = new AmplSolverInterface();
             Cutgen problemGen = new Cutgen();
-            const int TEST_ITERATIONS = 10;
-            const int BATCH_ITERATIONS = 4;
+            const int TEST_ITERATIONS = 1; //16
+            const int BATCH_ITERATIONS = 1; //4
 
             List<TestResult> amplTestResultList = new List<TestResult>();
             List<TestResult> binpackTestResultList = new List<TestResult>();
@@ -196,7 +106,7 @@ namespace EfficiencyTests
                 for (int j = 1; j <= BATCH_ITERATIONS; ++j)
                 {
                     //arrange
-                    var def = new ProblemGenerationDefinition { Size = 5 * i, StockLength = 1200, OrderLengthLowerBound = 0.3, OrderLengthUpperBound = 0.8, AverageDemand = 100 };
+                    var def = new ProblemGenerationDefinition { OrderCount = 5 * i, StockLength = 1200, OrderLengthLowerBound = 0.2, OrderLengthUpperBound = 0.8, AverageDemand = 100 };
                     CuttingStockProblemDataDTO problemData = problemGen.GenerateProblem(def);
                     problemData.AlgorithmSettings.RelaxationType = "none";
 
@@ -243,29 +153,114 @@ namespace EfficiencyTests
         }
 
 
-        [EfficiencyFact]
+        ///
+        ///!!!
+        ///OBSOLETE TESTS ONLY FOR DEBUG PURPOSES
+        ///!!!
+        ///
+
+        [EfficiencyFact(Skip = "Obsolete test")]
+        public void BinpackVSColumnGenerationRisingDemand()
+        {
+            AmplSolverInterface amplSolver = new AmplSolverInterface();
+            Cutgen problemGen = new Cutgen();
+            const int TEST_ITERATIONS = 1;
+            const int BATCH_ITERATIONS = 1;
+
+            List<TestResult> amplTestResultList = new List<TestResult>();
+            List<TestResult> binpackTestResultList = new List<TestResult>();
+            for (int i = 1; i <= TEST_ITERATIONS; ++i)
+            {
+                TestResult averagedAmplResults = new TestResult();
+                TestResult averagedBinpackResults = new TestResult();
+                for (int j = 1; j <= BATCH_ITERATIONS; ++j)
+                {
+                    //arrange
+                    var def = new ProblemGenerationDefinition { OrderCount = 10, StockLength = 1200, OrderLengthLowerBound = 0.3, OrderLengthUpperBound = 0.8, AverageDemand = 500 * i };
+                    CuttingStockProblemDataDTO problemData = problemGen.GenerateProblem(def);
+                    problemData.AlgorithmSettings.RelaxationType = "none";
+
+                    //act
+                    TestResult amplTestResults = amplSolver.SolveWithAMPL(problemData);
+                    TestResult binPackResults = BinPackSolver.SolveWithBinPack(problemData);
+
+                    //average data
+                    averagedAmplResults.Time += amplTestResults.Time / BATCH_ITERATIONS;
+                    averagedAmplResults.ObtainedValue += amplTestResults.ObtainedValue / BATCH_ITERATIONS;
+                    averagedAmplResults.ProblemSize = amplTestResults.ProblemSize;
+                    averagedBinpackResults.Time += binPackResults.Time / BATCH_ITERATIONS;
+                    averagedBinpackResults.ObtainedValue += binPackResults.ObtainedValue / BATCH_ITERATIONS;
+                    averagedBinpackResults.ProblemSize = binPackResults.ProblemSize;
+                }
+
+                amplTestResultList.Add(averagedAmplResults);
+                binpackTestResultList.Add(averagedBinpackResults);
+            }
+
+            //save to file
+            List<List<TestResult>> combinedResults = new List<List<TestResult>>
+            {
+                amplTestResultList,
+                binpackTestResultList
+            };
+            List<string> methodNames = new List<string> { "ampl", "binpack" };
+            TestResultSaver.SaveToCSVCombined(combinedResults, methodNames, "BpVsCgRisingDemand");
+        }
+
+        [EfficiencyFact(Skip = "Obsolete test")]
+        public void BinpackVSColumnGenerationRisingSize()
+        {
+            AmplSolverInterface amplSolver = new AmplSolverInterface();
+            Cutgen problemGen = new Cutgen();
+            const int TEST_ITERATIONS = 1;
+            const int BATCH_ITERATIONS = 1;
+
+            List<TestResult> amplTestResultList = new List<TestResult>();
+            List<TestResult> binpackTestResultList = new List<TestResult>();
+            for (int i = 1; i <= TEST_ITERATIONS; ++i)
+            {
+                TestResult averagedAmplResults = new TestResult();
+                TestResult averagedBinpackResults = new TestResult();
+                for (int j = 1; j <= BATCH_ITERATIONS; ++j)
+                {
+                    //arrange
+                    var def = new ProblemGenerationDefinition { OrderCount = 5 * i, StockLength = 1200, OrderLengthLowerBound = 0.3, OrderLengthUpperBound = 0.8, AverageDemand = 100 };
+                    CuttingStockProblemDataDTO problemData = problemGen.GenerateProblem(def);
+                    problemData.AlgorithmSettings.RelaxationType = "none";
+
+                    //act
+                    TestResult amplTestResults = amplSolver.SolveWithAMPL(problemData);
+                    TestResult binPackResults = BinPackSolver.SolveWithBinPack(problemData);
+
+                    //average data
+                    averagedAmplResults.Time += amplTestResults.Time / BATCH_ITERATIONS;
+                    averagedAmplResults.ObtainedValue += amplTestResults.ObtainedValue / BATCH_ITERATIONS;
+                    averagedAmplResults.ProblemSize = amplTestResults.ProblemSize;
+                    averagedBinpackResults.Time += binPackResults.Time / BATCH_ITERATIONS;
+                    averagedBinpackResults.ObtainedValue += binPackResults.ObtainedValue / BATCH_ITERATIONS;
+                    averagedBinpackResults.ProblemSize = binPackResults.ProblemSize;
+                }
+
+                amplTestResultList.Add(averagedAmplResults);
+                binpackTestResultList.Add(averagedBinpackResults);
+            }
+
+            //save to file
+            List<List<TestResult>> combinedResults = new List<List<TestResult>>
+            {
+                amplTestResultList,
+                binpackTestResultList
+            };
+            List<string> methodNames = new List<string> { "ampl", "binpack" };
+            TestResultSaver.SaveToCSVCombined(combinedResults, methodNames, "BpVsCgRisingSize");
+        }
+
+
+        [EfficiencyFact(Skip = "Obsolete test")]
         public void TestManual()
         {
             //arrange
-            AmplDataConverterFactory _amplDataConverterFactory = new AmplDataConverterFactory();
-            AmplApiServiceFactory _amplApiServiceFactory = new AmplApiServiceFactory();
-
-            //int stockCount = 1; var stockSizeRange = (1200, 1200); int orderSize = 20000; int orderLengthGap = 19;
-            //var problem = CuttingStockProblemGenerator.GenerateProblem(stockCount, stockSizeRange, orderSize, orderLengthGap);
-            //CuttingStockProblemDataDTO problemData = problem.Item1;
-            //AmplResult optimalResultData = problem.Item2;
-
-            //List<StockItem> stockItems = new List<StockItem>()
-            //{
-            //    new StockItem { Length = 100, Cost = 100}
-            //};
-            //List<OrderItem> orderItems = new List<OrderItem>()
-            //{
-            //    new OrderItem { Length = 60, Count = 400},
-            //    new OrderItem { Length = 30, Count = 300},
-            //    new OrderItem { Length = 17, Count = 800},
-            //    new OrderItem { Length = 13, Count = 500},
-            //};
+            AmplInstrumentsFactory _amplInstrumentsFactory = new AmplInstrumentsFactory();
 
             List<StockItem> stockItems = new List<StockItem>()
             {
@@ -286,19 +281,20 @@ namespace EfficiencyTests
             //act
             var settings = problemData.AlgorithmSettings;
             UniqueID uniqueId = new UniqueID();
-            var amplDataConverter = _amplDataConverterFactory.Create(settings, uniqueId.Get());
+            var amplDataConverter = _amplInstrumentsFactory.CreateConverter(settings, uniqueId.Get());
+            var amplDataValidator = _amplInstrumentsFactory.CreateValidator(settings);
 
             amplDataConverter.AdjustEntryData(problemData);
             string dataFilePath = amplDataConverter.ConvertToAmplDataFile(problemData);
 
-            var amplApiService = _amplApiServiceFactory.Create(settings);
+            var amplApiService = _amplInstrumentsFactory.CreateApiService(settings);
 
             Stopwatch sw = Stopwatch.StartNew();
             AmplResult amplResults = amplApiService.SolveCuttingStockProblem(dataFilePath);
             sw.Stop();
 
             amplDataConverter.DisposeDataFile();
-            amplDataConverter.ValidateResultData(amplResults, problemData);
+            amplDataValidator.ValidateResultData(amplResults, problemData);
 
             TestResult amplTestResults = new();
             amplTestResults.Time = sw.ElapsedMilliseconds;

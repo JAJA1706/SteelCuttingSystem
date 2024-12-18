@@ -11,14 +11,14 @@ export interface Segment {
 interface Pattern {
     stockId: number;
     stockLength: number;
-    count: number;
+    useCount: number;
     segmentList: Segment[];
 }
-export interface ResultPattern {
+export interface ResultPattern{
     patternId: number;
     stockId: number;
     stockLength: number;
-    count: number;
+    useCount: number;
     segmentList: Segment[];
 }
 export interface AmplResults {

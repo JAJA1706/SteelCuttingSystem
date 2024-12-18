@@ -123,7 +123,7 @@ namespace SteelCutOptimizer.Server.Tests.Utils
                 int stockLength;
                 do
                 {
-                    stockLength = rand.Next(stockSizeRange.Item1, stockSizeRange.Item2);
+                    stockLength = rand.Next(stockSizeRange.Item1, stockSizeRange.Item2+1);
                 } while (stockSet.Contains(stockLength));
 
                 stockSet.Add(stockLength);

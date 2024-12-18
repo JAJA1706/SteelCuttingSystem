@@ -12,6 +12,29 @@ interface SettingsPanelProps {
     setSettings: Dispatch<SetStateAction<Settings>>;
 }
 
+const algDescriptions = [
+    {
+        name: "manual",
+        desc: `This model assumes that the maximum relaxation value will be provided in the input data. 
+            The solution found will include relaxed lengths only if they improve the final result.
+            Relaxation values will be applied sparingly to avoid generating additional waste.`,
+    },
+    {
+        name: "auto",
+        desc: `This model attempts to determine the relaxation value automatically. 
+            It is up to the user to decide which items can be subject to relaxation. 
+            Under the 'Generate Result' button, there is a switch that allows for enabling or disabling the generation of basic patterns.
+            By basic patterns, we mean patterns consisting of a single type of final item.`,
+    },
+    {
+        name: "singleStep",
+        desc: `This model determines increasingly larger relaxation values, starting from the optimal solution without relaxation.
+            It is up to the user to decide which items can be subject to relaxation.
+            The user also selects a base item for which the next pattern will be determined.
+            The generation of the next pattern is performed by pressing the 'Generate Next Pattern' button.`
+    },
+];
+
 const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
     const onMainObjectiveChange = (e: string) => {
         setSettings(prev => {
@@ -29,6 +52,9 @@ const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
             };
         })
     };
+
+
+    const description = algDescriptions.find(x => x.name === settings.relaxationType)?.desc ?? "";
 
     return (
         <div className={classes.panelLayout}>
@@ -66,13 +92,18 @@ const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
                         <div className={classes.radio}>
                             <Radio value="singleStep" label="Single Step" classNames={{ label: classes.radioLabel }} />
                         </div>
+                        {settings.mainObjective === "waste" &&
+                            <div className={classes.radio}>
+                                <Radio value="manualFast" label="Manual Fast" classNames={{ label: classes.radioLabel }} />
+                            </div>}
                     </Group>
                 </Radio.Group>
             </div>
             <Divider />
             <div className={classes.textArea}>
                 <Text fw={700}>Algorithm Description</Text>
-                <Text> Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+                <Text> 
+                    {description}
                 </Text>
             </div>
         </div>

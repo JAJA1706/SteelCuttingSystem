@@ -1,6 +1,6 @@
 ﻿using SteelCutOptimizer.Server.Structs;
 
-namespace SteelCutOptimizer.Server.AmplApiServices
+namespace SteelCutOptimizer.Server.AMPLInstruments
 {
     public interface IAmplApiService
     {

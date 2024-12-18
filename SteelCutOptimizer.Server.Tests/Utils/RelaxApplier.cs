@@ -28,7 +28,7 @@ namespace SteelCutOptimizer.Server.Tests.Utils
             foreach( var order in problem.OrderList )
             {
                 var shouldBeRelaxed = rand.NextDouble();
-                if (shouldBeRelaxed < relaxProbability)
+                if (shouldBeRelaxed > relaxProbability)
                     continue;
 
                 var randomVal = rand.NextDouble();

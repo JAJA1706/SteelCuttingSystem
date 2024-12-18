@@ -3,7 +3,7 @@ using System.Text;
 using SteelCutOptimizer.Server.Structs;
 using System.Data;
 
-namespace SteelCutOptimizer.Server.AmplDataConverters
+namespace SteelCutOptimizer.Server.AMPLInstruments
 {
     public class MultipleStockDataConverter : IAmplDataConverter
     {
@@ -28,12 +28,12 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                 if (stock.Cost == null)
                     stock.Cost = 1;
                 if (stock.Count == null)
-                    stock.Count = Int32.MaxValue;
+                    stock.Count = int.MaxValue;
                 if (stock.NextStepGeneration == null)
                     stock.NextStepGeneration = false;
             }
 
-            foreach(var order in data.OrderList)
+            foreach (var order in data.OrderList)
             {
                 if (order.MaxRelax == null)
                     order.MaxRelax = 0;
@@ -58,7 +58,8 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
             prepareAdditionalDataAuto(fileContent, data);
             prepareAdditionalDataSingleStep(fileContent, data);
 
-            if (!Directory.Exists(dataFilePath)) {
+            if (!Directory.Exists(dataFilePath))
+            {
                 Directory.CreateDirectory(dataFilePath);
             }
 
@@ -89,7 +90,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                     fileContent.AppendLine($"{data.OrderList.IndexOf(order) + 1}  {order.Length}  {order.Count}  {convertBoolToInt(order.CanBeRelaxed)}");
                 }
             }
-            else if(settings.RelaxationType == "none")
+            else if (settings.RelaxationType == "none")
             {
                 fileContent.AppendLine("param: ORDERS: orderLengths  orderNum :=");
                 foreach (var order in data.OrderList)
@@ -148,7 +149,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
             fileContent.AppendLine(";");
         }
 
-        
+
         private void prepareAdditionalDataAuto(StringBuilder fileContent, CuttingStockProblemDataDTO data)
         {
             if (settings.RelaxationType != "auto")
@@ -165,7 +166,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                 return;
 
             int stockItemIdxToRelax = data.StockList!.FindIndex(x => x.NextStepGeneration == true);
-            if(stockItemIdxToRelax != -1)
+            if (stockItemIdxToRelax != -1)
             {
                 fileContent.AppendLine($"param stockItemToRelax := {stockItemIdxToRelax + 1};");
             }
@@ -226,11 +227,11 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                 fileContent.AppendLine();
             }
 
-            if(data.OrderPrices != null && data.OrderPrices.Count > 0)
+            if (data.OrderPrices != null && data.OrderPrices.Count > 0)
             {
                 fileContent.Append("param price := ");
-                for( int i = 0; i < data.OrderPrices.Count; ++i)
-                    fileContent.Append($"[{i+1}] {data.OrderPrices[i]}, ");
+                for (int i = 0; i < data.OrderPrices.Count; ++i)
+                    fileContent.Append($"[{i + 1}] {data.OrderPrices[i].ToString().Replace(',', '.')}, ");
                 fileContent.Replace(",", ";", fileContent.Length - 2, 1);
                 fileContent.AppendLine();
             }
@@ -239,7 +240,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
             {
                 fileContent.AppendLine("param prevStockLimit := ");
                 for (int i = 0; i < data.StockLimits.Count; ++i)
-                    fileContent.Append($"[{i+1}] {data.StockLimits[i]}, ");
+                    fileContent.Append($"[{i + 1}] {data.StockLimits[i].ToString().Replace(',', '.')}, ");
                 fileContent.Replace(",", ";", fileContent.Length - 2, 1);
                 fileContent.AppendLine();
             }
@@ -248,7 +249,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
         private bool isFastVersionSuitable(CuttingStockProblemDataDTO data)
         {
             if (settings.RelaxationType != "manualFast" ||
-                data.StockList!.Any(o => o.Count != Int32.MaxValue))
+                data.StockList!.Any(o => o.Count != int.MaxValue))
                 return false;
 
             return true;
@@ -257,34 +258,6 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
         public void DisposeDataFile()
         {
             Directory.Delete(dataFilePath, true);
-        }
-
-        public void ValidateResultData(AmplResult amplResult, CuttingStockProblemDataDTO entryData)
-        {
-            if(amplResult.IsFeasible == false)
-                throw new InvalidDataException("infeasible problem");
-
-            //Check if at least one proper Pattern exists 
-            if(!amplResult.Patterns.Values.Any(x => x.UseCount > 0))
-                throw new InvalidDataException("infeasible problem");
-
-            //Checking if amount of stock items used is not greater than allowed
-            Dictionary<int, int> usedStockLengths = [];
-            foreach (var pattern in amplResult.Patterns)
-            {
-                if (!usedStockLengths.ContainsKey(pattern.Value.StockLength))
-                    usedStockLengths[pattern.Value.StockLength] = 0;
-
-                usedStockLengths[pattern.Value.StockLength] += pattern.Value.UseCount;
-            }
-            foreach (var stock in entryData.StockList ?? [])
-            {
-                if(usedStockLengths.TryGetValue(stock.Length, out int usedStockCount))
-                {
-                    if (stock.Count < usedStockCount)
-                        throw new InvalidDataException("infeasible problem");
-                }
-            }
         }
 
         public CuttingStockResultsDTO ConvertResultDataToDTO(AmplResult amplResult)
@@ -296,10 +269,10 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
                 item.StockLength = pattern.Value.StockLength;
                 item.StockId = pattern.Value.StockId;
                 item.SegmentList = pattern.Value.SegmentList;
-                item.Count = pattern.Value.UseCount;
+                item.UseCount = pattern.Value.UseCount;
 
-                if (item.Count > 0
-                    || settings.RelaxationType == "none" 
+                if (item.UseCount > 0
+                    || settings.RelaxationType == "none"
                     || settings.RelaxationType == "singleStep"
                     )
                 {
@@ -335,12 +308,12 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
         {
             int stockLengthSum = 0;
             int segmentsLengthSum = 0;
-            foreach( var pattern in Patterns)
+            foreach (var pattern in Patterns)
             {
-                stockLengthSum += pattern.StockLength * pattern.Count;
-                foreach(var segment in pattern.SegmentList)
+                stockLengthSum += pattern.StockLength * pattern.UseCount;
+                foreach (var segment in pattern.SegmentList)
                 {
-                    segmentsLengthSum += segment.Length * pattern.Count;
+                    segmentsLengthSum += segment.Length * pattern.UseCount;
                 }
             }
             return stockLengthSum - segmentsLengthSum;
@@ -353,7 +326,7 @@ namespace SteelCutOptimizer.Server.AmplDataConverters
             {
                 foreach (var segment in pattern.SegmentList)
                 {
-                    totalRelax += segment.RelaxAmount * pattern.Count;
+                    totalRelax += segment.RelaxAmount * pattern.UseCount;
                 }
             }
             return totalRelax;

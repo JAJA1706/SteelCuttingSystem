@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using SteelCutOptimizer.Server.AmplApiServices;
-using SteelCutOptimizer.Server.AmplDataConverters;
-using SteelCutOptimizer.Server.Controllers;
 using SteelCutOptimizer.Server.DTO;
 using SteelCutOptimizer.Server.Structs;
 using System.Net.Http.Json;
 using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
 using SteelCutOptimizer.Server;
-using SteelCutOptimizer.Server.Tests.Utils;
 
 namespace IntegrationTests{
     public class CuttingStockControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>

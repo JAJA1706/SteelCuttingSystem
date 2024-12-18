@@ -4,7 +4,7 @@
     {
         public string MainObjective { get; set; } = "cost";
         public string RelaxationType { get; set; } = "manual";
-
+        public string Solver { get; set; } = "cbc";
 
         public AlgorithmSettings() { }
         public AlgorithmSettings(AlgorithmSettings copyObj) 

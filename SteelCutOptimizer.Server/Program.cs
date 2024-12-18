@@ -1,5 +1,4 @@
-using SteelCutOptimizer.Server.AmplApiServices;
-using SteelCutOptimizer.Server.AmplDataConverters;
+using SteelCutOptimizer.Server.AMPLInstruments;
 using SteelCutOptimizer.Server.Middleware;
 
 namespace SteelCutOptimizer.Server
@@ -21,8 +20,7 @@ namespace SteelCutOptimizer.Server
 
             // Add services to the container.
             builder.Services.AddControllers();
-            builder.Services.AddSingleton<IAmplDataConverterFactory, AmplDataConverterFactory>();
-            builder.Services.AddSingleton<IAmplApiServiceFactory, AmplApiServiceFactory>();
+            builder.Services.AddSingleton<IAmplInstrumentsFactory, AmplInstrumentsFactory>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

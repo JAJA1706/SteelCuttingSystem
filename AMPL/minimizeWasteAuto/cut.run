@@ -1,4 +1,5 @@
-option solver cbc;
+#option solver cbc;
+#option cbc_options 'timelimit=240';
 option solution_round 6;
 
 #model .../cut.mod;
@@ -38,6 +39,7 @@ param minRelaxCost;
 param isFeasible;
 let isFeasible := 1;
 param isNewPattern;
+param numericTolerance := -0.1;
 repeat
 {
 	solve Cutting_Opt;
@@ -46,7 +48,6 @@ repeat
 	let isNewPattern := 0;
 	for{i in STOCK}
 	{
-	
 		for {x in ORDERS}
 		{
 			let tempRelax := ceil(stockLengths[i]/orderLengths[x]) * orderLengths[x] - stockLengths[i];
@@ -58,7 +59,7 @@ repeat
 			else
 			{
 				
-				let relaxCost[x] := StockLimit[i]/tempRelax + (price[x]*tempRelax + stockLengths[i]*price[x])/(orderLengths[x]*tempRelax) + 0.01; #values lower than this will allow patterns with only one type of orderLength
+				let relaxCost[x] := StockLimit[i]/tempRelax + numericTolerance/tempRelax + (price[x]*tempRelax + stockLengths[i]*price[x])/(orderLengths[x]*tempRelax) + 0.01; #values lower than this will allow patterns with only one type of orderLength
 				if relaxCost[x] <= minRelaxCost then
 				{
 					let relaxCost[x] := minRelaxCost + 0.01;
@@ -69,7 +70,7 @@ repeat
 		let stockLength := stockLengths[i];
 		solve Pattern_Gen_Relax;
 		
-		if ReducedCost - StockLimit[i] < -0.00001 then
+		if ReducedCost - StockLimit[i] < numericTolerance then
 		{
 			let nPAT[i] := nPAT[i] + 1;
 			let {x in ORDERS} lfep[i,x,nPAT[i]] := Use[x];

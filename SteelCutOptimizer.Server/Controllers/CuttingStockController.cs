@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using SteelCutOptimizer.Server.AmplApiServices;
-using SteelCutOptimizer.Server.AmplDataConverters;
 using SteelCutOptimizer.Server.DTO;
 using SteelCutOptimizer.Server.Structs;
 using SteelCutOptimizer.Server.Utils;
-using System.Text.Json;
+using SteelCutOptimizer.Server.AMPLInstruments;
 
 namespace SteelCutOptimizer.Server.Controllers
 {
@@ -13,17 +11,14 @@ namespace SteelCutOptimizer.Server.Controllers
     public class CuttingStockController : ControllerBase
     {
         private readonly ILogger<CuttingStockController> _logger;
-        private readonly IAmplDataConverterFactory _amplDataConverterFactory;
-        private readonly IAmplApiServiceFactory _amplApiServiceFactory;
+        private readonly IAmplInstrumentsFactory _amplInstrumentsFactory;
 
         public CuttingStockController(
-            ILogger<CuttingStockController> logger, 
-            IAmplDataConverterFactory amplDataConverterFactory,
-            IAmplApiServiceFactory amplApiServiceFactory)
+            ILogger<CuttingStockController> logger,
+            IAmplInstrumentsFactory amplInstrumentsFactory)
         {
             _logger = logger;
-            _amplDataConverterFactory = amplDataConverterFactory;
-            _amplApiServiceFactory = amplApiServiceFactory;
+            _amplInstrumentsFactory = amplInstrumentsFactory;
         }
 
         [HttpPost]
@@ -33,18 +28,20 @@ namespace SteelCutOptimizer.Server.Controllers
             {
                 var settings = problemData.AlgorithmSettings;
                 UniqueID uniqueId = new UniqueID();
-                var amplDataConverter = _amplDataConverterFactory.Create(settings, uniqueId.Get());
+                var dataConverter = _amplInstrumentsFactory.CreateConverter(settings, uniqueId.Get());
+                var dataValidator = _amplInstrumentsFactory.CreateValidator(settings);
 
-                amplDataConverter.AdjustEntryData(problemData);
-                string dataFilePath = amplDataConverter.ConvertToAmplDataFile(problemData);
+                dataValidator.ValidateEntryData(problemData);
+                dataConverter.AdjustEntryData(problemData);
+                string dataFilePath = dataConverter.ConvertToAmplDataFile(problemData);
 
 
-                var amplApiService = _amplApiServiceFactory.Create(settings);
-                AmplResult results = amplApiService.SolveCuttingStockProblem(dataFilePath);
+                var apiService = _amplInstrumentsFactory.CreateApiService(settings);
+                AmplResult results = apiService.SolveCuttingStockProblem(dataFilePath);
 
-                amplDataConverter.DisposeDataFile();
-                amplDataConverter.ValidateResultData(results, problemData);
-                var dto = amplDataConverter.ConvertResultDataToDTO(results);
+                dataConverter.DisposeDataFile();
+                dataValidator.ValidateResultData(results, problemData);
+                var dto = dataConverter.ConvertResultDataToDTO(results);
 
                 return Ok(dto);
             }

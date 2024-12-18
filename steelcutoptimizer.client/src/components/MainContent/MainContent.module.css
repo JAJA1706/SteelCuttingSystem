@@ -84,4 +84,10 @@
     .algorithmEditor {
         max-width: 100%;
     }
+
+    .mainBody {
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+    }
 }

@@ -70,7 +70,7 @@ const MainContent = () => {
                 return {
                     stockId: resPattern.stockId,
                     stockLength: resPattern.stockLength,
-                    count: resPattern.count,
+                    useCount: resPattern.useCount,
                     segmentList: resPattern.segmentList,
                 }
             })

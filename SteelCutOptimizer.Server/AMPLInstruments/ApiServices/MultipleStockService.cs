@@ -1,21 +1,20 @@
 ﻿using ampl.Entities;
 using ampl;
 using SteelCutOptimizer.Server.Structs;
-using SteelCutOptimizer.Server.DTO;
 
-namespace SteelCutOptimizer.Server.AmplApiServices
+namespace SteelCutOptimizer.Server.AMPLInstruments
 {
     public class MultipleStockService : IAmplApiService
     {
         private readonly string modelPath;
         private readonly AlgorithmSettings settings;
 
-        public MultipleStockService(AlgorithmSettings _settings) 
+        public MultipleStockService(AlgorithmSettings _settings)
         {
             settings = _settings;
             if (settings.MainObjective == "cost")
             {
-                if(settings.RelaxationType == "none")
+                if (settings.RelaxationType == "none")
                     modelPath = AppDomain.CurrentDomain.BaseDirectory + "AmplModels/minimizeCostNoRelax/";
                 else
                     throw new NotImplementedException();
@@ -37,6 +36,7 @@ namespace SteelCutOptimizer.Server.AmplApiServices
             {
                 ampl.Read(Path.Combine(modelPath, "cut.mod"));
                 ampl.ReadData(Path.Combine(dataFilePath, "cut.dat"));
+                initializeSolver(ampl);
                 ampl.Read(Path.Combine(modelPath, "cut.run"));
 
                 Parameter lengthForEachPattern = ampl.GetParameter("lfep");
@@ -49,7 +49,7 @@ namespace SteelCutOptimizer.Server.AmplApiServices
                 var result = new AmplResult();
                 foreach (var item in lfepDataFrame)
                 {
-                    int usedOrderItemsCount = (int)item[3].Dbl; 
+                    int usedOrderItemsCount = (int)item[3].Dbl;
                     if (usedOrderItemsCount != 0)
                     {
                         int stockIdx = (int)item[0].Dbl;
@@ -58,7 +58,7 @@ namespace SteelCutOptimizer.Server.AmplApiServices
                         int usedOrderLength = (int)orderLengths[orderIdx].Dbl;
 
                         Tuple<int, int> patternIdx = new(stockIdx, patternPartialIdx);
-                        if(result.Patterns.ContainsKey(patternIdx))
+                        if (result.Patterns.ContainsKey(patternIdx))
                         {
                             Segment newSegment = new(orderIdx, usedOrderLength, 0);
                             List<Segment> relaxedLengths = Enumerable.Repeat(newSegment, usedOrderItemsCount).ToList();
@@ -78,7 +78,7 @@ namespace SteelCutOptimizer.Server.AmplApiServices
                 }
 
 
-                
+
                 Parameter stockLimit = ampl.GetParameter("stockLimitSaved");
                 var stockLimitDataFrame = stockLimit.GetValues();
                 foreach (var limit in stockLimitDataFrame)
@@ -100,6 +100,15 @@ namespace SteelCutOptimizer.Server.AmplApiServices
 
                 return result;
             }
+        }
+
+        private void initializeSolver(AMPL ampl)
+        {
+            if (settings.Solver != "cbc" && settings.Solver != "highs" && settings.Solver != "cplex")
+                throw new NotImplementedException();
+
+            ampl.SetOption("solver", settings.Solver);
+            ampl.SetOption($"{settings.Solver}_options", "timelimit=240");
         }
     }
 }

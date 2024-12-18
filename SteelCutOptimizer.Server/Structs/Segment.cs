@@ -13,5 +13,15 @@
             Length = length;
             RelaxAmount = relaxAmount;
         }
+
+        public Segment(Segment copyObj)
+        {
+            if (copyObj == null)
+                throw new ArgumentNullException();
+
+            OrderId = copyObj.OrderId;
+            Length = copyObj.Length;
+            RelaxAmount = copyObj.RelaxAmount;
+        }
     }
 }

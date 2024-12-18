@@ -1,4 +1,5 @@
-option solver cbc;
+#option solver cbc;
+#option cbc_options 'timelimit=240';
 option solution_round 6;
 
 #model .../cut.mod;
@@ -48,7 +49,7 @@ repeat
 		let stockLength := stockLengths[i];
 		solve Pattern_Gen;
 		
-		if ReducedCost - StockLimit[i] < -0.00001 then
+		if ReducedCost - StockLimit[i] < -0.1 then
 		{
 			let nPAT[i] := nPAT[i] + 1;
 			let {x in ORDERS} lfep[i,x,nPAT[i]] := Use[x];
