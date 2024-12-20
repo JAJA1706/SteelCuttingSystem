@@ -7,7 +7,22 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
     {
         public void ValidateEntryData(CuttingStockProblemDataDTO entryData)
         {
-            return;
+            if(entryData.OrderList == null || entryData.StockList == null)
+                throw new InvalidDataException("Stock list nor Order list cannot be null");
+
+            long orderLengthSum = entryData.OrderList.Aggregate((long)0, (sum, next) => sum += next.Length * next.Count);
+
+            long stockLengthSum;
+            var unlimitedStock = entryData.StockList.Find(x => x.Count == null);
+            if (unlimitedStock != null)
+                stockLengthSum = long.MaxValue;
+            else
+                stockLengthSum = entryData.StockList.Aggregate((long)0, (sum, next) => sum += next.Length * (int)next.Count!);
+
+            if(orderLengthSum > stockLengthSum)
+                throw new InvalidDataException("infeasible problem, sum of order lengths is higher than sum of stock lengths");
+
+            return ;
         }
 
         public void ValidateResultData(AmplResult amplResult, CuttingStockProblemDataDTO entryData)

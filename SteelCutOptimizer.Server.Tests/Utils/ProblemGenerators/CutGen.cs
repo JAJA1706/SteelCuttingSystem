@@ -112,7 +112,7 @@ namespace SteelCutOptimizer.Server.Tests.Utils
             return result;
         }
 
-        private List<OrderItem> merge(int[] lengths, int[] demands)
+        private static List<OrderItem> merge(int[] lengths, int[] demands)
         {
             var orders = new List<OrderItem>();
             for (int i = 0; i < lengths.Length; i++)

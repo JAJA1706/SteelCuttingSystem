@@ -12,6 +12,7 @@ namespace EfficiencyTests
         {
             AmplSolverInterface amplSolver = new AmplSolverInterface();
             Cutgen problemGen = new Cutgen();
+            CuttingStockProblemGenerator cspg = new CuttingStockProblemGenerator();
             const int TEST_ITERATIONS = 1; //18
             const int BATCH_ITERATIONS = 1; //3
 
@@ -36,8 +37,7 @@ namespace EfficiencyTests
                     problemDataCutgen.AlgorithmSettings.RelaxationType = "manual";
                     RelaxApplier.ApplyRelax(problemDataCutgen, 0.5, 0, 0.2);
 
-                    var stockSizeRange = (900, 1200); int minOrderSize = 1000; var orderSizeRange = (0.1, 0.8);
-                    var problem = CuttingStockProblemGenerator.GenerateProblem(stockCount, stockSizeRange, orderCount, minOrderSize, orderSizeRange);
+                    var problem = cspg.GenerateProblem(def);
                     CuttingStockProblemDataDTO problemDataCSPG = problem.Item1;
                     problemDataCSPG.AlgorithmSettings.RelaxationType = "manual";
                     RelaxApplier.ApplyRelax(problemDataCSPG, 0.5, 0, 0.2);

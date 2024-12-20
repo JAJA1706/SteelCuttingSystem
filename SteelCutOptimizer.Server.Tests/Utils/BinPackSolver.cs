@@ -56,7 +56,7 @@ namespace SteelCutOptimizer.Server.Tests.Utils
 
                 for (int i = 0; i < openedBins.Count; i++)
                 {
-                    int remainingBinCapacity = binCapacity - SumOfItems(openedBins[i]);
+                    int remainingBinCapacity = binCapacity - sumOfItems(openedBins[i]);
                     if (item <= remainingBinCapacity)
                     {
                         openedBins[i].Add(item);
@@ -84,7 +84,7 @@ namespace SteelCutOptimizer.Server.Tests.Utils
             return closedBins;
         }
 
-        static int SumOfItems(List<int> items)
+        private static int sumOfItems(List<int> items)
         {
             int total = 0;
             foreach (var val in items)

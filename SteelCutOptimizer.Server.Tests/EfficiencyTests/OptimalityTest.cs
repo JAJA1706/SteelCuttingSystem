@@ -12,6 +12,7 @@ namespace EfficiencyTests
         public void OptimalValuesTest()
         {
             AmplSolverInterface amplSolver = new AmplSolverInterface();
+            CuttingStockProblemGenerator gpcs = new CuttingStockProblemGenerator();
             const int TEST_ITERATIONS = 1; //18
             const int BATCH_ITERATIONS = 1; //3
 
@@ -39,8 +40,10 @@ namespace EfficiencyTests
                 for (int j = 1; j <= BATCH_ITERATIONS; ++j)
                 {
                     //arrange
-                    stockCount = (int)Math.Ceiling((i / 6.0)); var stockSizeRange = (900, 1200); int minOrderCount = 10 + ((i - 1) % 6) * 2; int minOrderSize = 1000; var orderSizeRange = (0.1, 0.8);
-                    var problem = CuttingStockProblemGenerator.GenerateProblem(stockCount, stockSizeRange, minOrderCount, minOrderSize, orderSizeRange);
+                    stockCount = (int)Math.Ceiling((i / 6.0)); 
+                    int orderCount = 10 + ((i - 1) % 6) * 2;
+                    var def = new ProblemGenerationDefinition { OrderCount = orderCount, StockCount = stockCount, StockLengthLowerBound = 900, StockLengthUpperBound = 1200, OrderLengthLowerBound = 0.1, OrderLengthUpperBound = 0.8, AverageDemand = 1000 / orderCount };
+                    var problem = gpcs.GenerateProblem(def);
                     CuttingStockProblemDataDTO problemData = problem.Item1;
                     AmplResult optimalResultData = problem.Item2;
                     problemData.AlgorithmSettings.RelaxationType = "none";

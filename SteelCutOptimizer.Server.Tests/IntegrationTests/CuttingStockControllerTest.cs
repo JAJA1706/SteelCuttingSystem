@@ -63,5 +63,30 @@ namespace IntegrationTests{
             var errorMessage = await response.Content.ReadAsStringAsync();
             Assert.NotEmpty(errorMessage);
         }
+
+        [Fact]
+        public async void SolveUnfeasibleProblem()
+        {
+            // Arrange
+            List<StockItem> stockItems = new List<StockItem>()
+            {
+                new StockItem { Length = 1000, Count = 100 }
+            };
+            List<OrderItem> orderItems = new List<OrderItem>()
+            {
+                new OrderItem { Length = 1000, Count = 100 },
+                new OrderItem { Length = 1, Count = 1}
+            };
+            var problemData = new CuttingStockProblemDataDTO { StockList = stockItems, OrderList = orderItems, AlgorithmSettings = new() };
+
+            // Act
+            Thread.Sleep(250); //avoid triggering requestRateLimiter
+            var response = await _client.PostAsJsonAsync("/CuttingStock", problemData);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            Assert.NotEmpty(errorMessage);
+        }
     }
 }

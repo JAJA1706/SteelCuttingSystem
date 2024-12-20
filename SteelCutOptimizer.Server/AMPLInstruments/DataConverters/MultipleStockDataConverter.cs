@@ -304,7 +304,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
             return dto;
         }
 
-        private int calculateTotalWaste(List<ResultPattern> Patterns)
+        private static int calculateTotalWaste(List<ResultPattern> Patterns)
         {
             int stockLengthSum = 0;
             int segmentsLengthSum = 0;
@@ -319,7 +319,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
             return stockLengthSum - segmentsLengthSum;
         }
 
-        private int calculateTotalRelax(List<ResultPattern> Patterns)
+        private static int calculateTotalRelax(List<ResultPattern> Patterns)
         {
             int totalRelax = 0;
             foreach (var pattern in Patterns)
