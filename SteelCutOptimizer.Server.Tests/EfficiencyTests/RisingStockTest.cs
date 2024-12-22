@@ -6,10 +6,10 @@ using Xunit.Abstractions;
 
 namespace EfficiencyTests
 {
-    public class CostManualTest
+    public class RisingStockTest
     {
         private readonly ITestOutputHelper output;
-        public CostManualTest(ITestOutputHelper output)
+        public RisingStockTest(ITestOutputHelper output)
         {
             this.output = output;
         }
