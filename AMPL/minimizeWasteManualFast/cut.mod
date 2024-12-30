@@ -4,6 +4,7 @@
 # ----------------------------------------
 set STOCK;
 param stockLengths {STOCK} > 0;        			# length of raw bars [.dat]
+param stockNum {STOCK} > 0;
 set ORDERS;                   					# set of orderLengths to be cut [.dat]
 param orderLengths {ORDERS} > 0;				# length of ordered bars [.dat]
 param orderNum {ORDERS} > 0;    				# number of each width to be cut [.dat]
@@ -19,21 +20,28 @@ minimize Waste:
 	sum {i in STOCK, j in PATTERNS[i]} (stockLengths[i] - (sum{x in ORDERS} (lfep[i,x,j] * orderLengths[x] - rfep[i,x,j]))) * usedPatterns[i,j];
 subj to FillOrder {x in ORDERS}:
 	sum {i in STOCK, j in PATTERNS[i]} lfep[i,x,j] * usedPatterns[i,j] >= orderNum[x];
+subj to StockLimit {i in STOCK}:
+	sum{ j in PATTERNS[i]} usedPatterns[i,j] <= stockNum[i];
    
 # ----------------------------------------
 # KNAPSACK SUBPROBLEM
 # ----------------------------------------
-param relaxCost default 0.01;
+param relaxCost {ORDERS} default 0.01;
 param price {ORDERS} default 0.0;
+param stockLimit {STOCK} default 0.0;
 var Use {ORDERS} integer >= 0;
 var Relax {ORDERS} integer >= 0;
 var StockUse {STOCK} integer >= 0;
 	
 minimize ReducedCost:
-	sum {i in STOCK} stockLengths[i] * StockUse[i] - sum{x in ORDERS}(orderLengths[x] * Use[x] - Relax[x] + price[x]*Use[x] - Relax[x]*relaxCost);
+	sum {i in STOCK} (stockLengths[i] - stockLimit[i]) * StockUse[i] - sum{x in ORDERS}(orderLengths[x] * Use[x] - Relax[x] + price[x]*Use[x] - Relax[x]*relaxCost[x]);
 subj to LengthLimit:
    sum {x in ORDERS} (orderLengths[x] * Use[x] - Relax[x]) <= sum {i in STOCK} stockLengths[i] * StockUse[i];
 subj to OneStock:
 	sum {i in STOCK} StockUse[i] = 1;
 subj to MaxRelax {x in ORDERS}:
 	Relax[x] <= maxRelax[x] * Use[x];
+
+	
+#additional params for cut.run
+param relaxCostMultiplier default 1;

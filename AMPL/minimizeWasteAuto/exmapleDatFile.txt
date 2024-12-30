@@ -11,4 +11,5 @@ param: STOCK: stockLengths stockNum:=
 	2	900 120
 	3   575 120;
 	
+param relaxCostMultiplier := 1;
 param allowBasicPatterns := 0;

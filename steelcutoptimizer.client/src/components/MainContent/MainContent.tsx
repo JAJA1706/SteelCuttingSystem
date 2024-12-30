@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Button, Paper, Divider, Switch, Tooltip, ThemeIcon } from '@mantine/core'
+import { Button, Paper, Divider, Switch, Tooltip, ThemeIcon, Slider, Text } from '@mantine/core'
 import StockTable, { Stock } from "../DataTables/StockTable"
 import OrderTable, { Order } from "../DataTables/OrderTable"
 import PatternTable from "../ResultTables/PatternTable"
@@ -9,14 +9,15 @@ import useSolveCuttingStockProblem, { CuttingStockProblemBody, AmplResults } fro
 import useResetStore from "../../hooks/useResetStore"
 import { showNotification } from '@mantine/notifications'
 import SettingsPanel, { Settings } from '../SettingsPanel/SettingsPanel'
-import { IconQuestionMark } from '@tabler/icons-react';
+import { IconQuestionMark } from '@tabler/icons-react'
 
 const MainContent = () => {
     const stockDataRef = useRef<Stock[]>([]);
     const orderDataRef = useRef<Order[]>([]);
     const setResetResultFunction = useResetStore((state) => state.setResetResultFunction);
-    const [algorithmSettings, setAlgorithmSettings] = useState<Settings>({ mainObjective: "cost", relaxationType: "manual" });
+    const [algorithmSettings, setAlgorithmSettings] = useState<Settings>({ mainObjective: "cost", relaxationType: "manual", solver: "cbc" });
     const [switchValue, setSwitchValue] = useState(false);
+    const sliderValue = useRef(1);
     const [fetchedData, setFetchedData] = useState<AmplResults | undefined>(undefined);
 
     const onSolvingError = (err: Error) => {
@@ -31,6 +32,13 @@ const MainContent = () => {
 
     const onSolvingSuccess = (data: AmplResults) => {
         setFetchedData(data);
+        showNotification({
+            color: 'green',
+            title: "Problem solved successfully",
+            message: "",
+            className: classes.notification,
+            autoClose: 3000
+        });
     };
 
     const {
@@ -45,10 +53,8 @@ const MainContent = () => {
             orderList: [...orderDataRef.current],
         };
 
-        if (algorithmSettings.mainObjective === "waste" && algorithmSettings.relaxationType === "manual") {
-            if (!stockDataRef.current.some(stock => !!stock.count))
-                requestBody.algorithmSettings.relaxationType = "manualFast";
-        }
+        if (algorithmSettings.relaxationType !== "singleStep")
+            requestBody.relaxCostMultiplier = sliderValue.current;
 
         if (algorithmSettings.relaxationType === "auto")
             requestBody.areBasicPatternsAllowed = switchValue;
@@ -135,6 +141,19 @@ const MainContent = () => {
                                             </ThemeIcon>
                                         </Tooltip>
                                     
+                                    </div>
+                                )}
+                                {(algorithmSettings.relaxationType !== "singleStep") && (
+                                    <div className={classes.slider}>
+                                        <Text size="sm">Relax Cost Multiplier</Text>
+                                        <Slider
+                                            onChange={(value) => sliderValue.current = (1 / (1 - value))}
+                                            defaultValue={0}
+                                            min={0}
+                                            max={0.99}
+                                            label={(value) => `${(1 / (1 - value)).toFixed(2)}x`}
+                                            step={0.01}
+                                        />
                                     </div>
                                 )}
                             </div>

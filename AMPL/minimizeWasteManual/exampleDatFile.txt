@@ -9,4 +9,6 @@ param: ORDERS: orderLengths  orderNum  maxRelax:=
 	
 param: STOCK: stockLengths stockNum:=
 	1	1200	5
-	2	1000	100
+	2	1000	100;
+	
+param relaxCostMultiplier := 1;

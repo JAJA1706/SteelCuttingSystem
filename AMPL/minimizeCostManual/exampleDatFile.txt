@@ -9,3 +9,5 @@ param: STOCK: stockLengths stockNum stockCost :=
 1  100  10	1
 2  150  10	1
 ;
+
+param relaxCostMultiplier := 1;

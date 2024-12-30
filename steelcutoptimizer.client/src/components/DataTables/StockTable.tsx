@@ -6,7 +6,7 @@ import useStockStore from "../../hooks/useStockStore"
 import { useShallow } from 'zustand/react/shallow';
 import DynamicTable, { BaseData } from './DynamicTable';
 import { Settings } from '../SettingsPanel/SettingsPanel';
-import { Radio } from "@mantine/core";
+import { Radio, Title, Stack } from "@mantine/core";
 
 export interface Stock extends BaseData {
     cost: number | undefined;
@@ -201,15 +201,16 @@ const DynamicTableStock = ({ dataRef, algorithmSettings }: DynamicTableStockProp
         } as Stock;
     } 
 
-    return(
-        <div>
+    return (
+        <Stack align="center" gap="3px">
+            <Title size="h4">Stock Table</Title>
             <DynamicTable<Stock>
                 data={data}
                 setData={setData}
                 columns={columns}
                 getDefaultNewRow={getDefaultNewRow}
             />
-        </div>
+        </Stack>
     );
 };
 

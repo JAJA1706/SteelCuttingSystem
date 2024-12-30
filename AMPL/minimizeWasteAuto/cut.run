@@ -65,6 +65,8 @@ repeat
 					let relaxCost[x] := minRelaxCost + 0.01;
 				}
 			}
+			
+			let relaxCost[x] := relaxCost[x] * relaxCostMultiplier;
 		};
 	
 		let stockLength := stockLengths[i];

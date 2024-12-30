@@ -8,10 +8,11 @@ namespace SteelCutOptimizer.Server.DTO
         public AlgorithmSettings AlgorithmSettings { get; set; } = new AlgorithmSettings();
         public List<StockItem>? StockList { get; set; }
         public List<OrderItem>? OrderList { get; set; }
-        public List<Pattern>? Patterns {get; set; }   //used only in singleStep mode
-        public bool? AreBasicPatternsAllowed { get; set; } //used only in auto mode
-        public List<double>? OrderPrices { get; set; } //used only in singleStep mode
-        public List<double>? StockLimits { get; set; } //used only in singleStep mode
+        public List<Pattern>? Patterns {get; set; }         //used only in singleStep mode
+        public bool? AreBasicPatternsAllowed { get; set; }  //used only in auto mode
+        public List<double>? OrderPrices { get; set; }      //used only in singleStep mode
+        public List<double>? StockLimits { get; set; }      //used only in singleStep mode
+        public double? RelaxCostMultiplier { get; set; }    //used in manual and auto mode
 
         public CuttingStockProblemDataDTO(){}
         public CuttingStockProblemDataDTO(CuttingStockProblemDataDTO copyObj)
@@ -26,6 +27,7 @@ namespace SteelCutOptimizer.Server.DTO
             AreBasicPatternsAllowed = copyObj.AreBasicPatternsAllowed;
             OrderPrices = copyObj.OrderPrices?.ToList();
             StockLimits = copyObj.StockLimits?.ToList();
+            RelaxCostMultiplier = copyObj.RelaxCostMultiplier;
         }
     }
 }

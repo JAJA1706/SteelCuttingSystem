@@ -5,6 +5,7 @@ import classes from "./SettingsPanel.module.css"
 export interface Settings {
     mainObjective: string,
     relaxationType: string,
+    solver: string,
 }
 
 interface SettingsPanelProps {
@@ -33,6 +34,10 @@ const algDescriptions = [
             The user also selects a base item for which the next pattern will be determined.
             The generation of the next pattern is performed by pressing the 'Generate Next Pattern' button.`
     },
+    {
+        name: "manualFast",
+        desc: `This model is considered fast because it requires only one iteration of knapsack subproblem. In other aspects it is similar to manual relaxation.`,
+    },
 ];
 
 const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
@@ -49,6 +54,14 @@ const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
             return {
                 ...prev,
                 relaxationType: e,
+            };
+        })
+    };
+    const onSolverTypeChange = (e: string) => {
+        setSettings(prev => {
+            return {
+                ...prev,
+                solver: e,
             };
         })
     };
@@ -96,6 +109,24 @@ const SettingsPanel = ({ settings, setSettings }: SettingsPanelProps) => {
                             <div className={classes.radio}>
                                 <Radio value="manualFast" label="Manual Fast" classNames={{ label: classes.radioLabel }} />
                             </div>}
+                    </Group>
+                </Radio.Group>
+                <Radio.Group
+                    value={settings.solver}
+                    onChange={onSolverTypeChange}
+                    label="Solver:"
+                    className={classes.radioGroup}
+                >
+                    <Group>
+                        <div className={classes.radio}>
+                            <Radio value="cbc" label="Cbc" classNames={{ label: classes.radioLabel }} />
+                        </div>
+                        <div className={classes.radio}>
+                            <Radio value="highs" label="HiGHS" classNames={{ label: classes.radioLabel }} />
+                        </div>
+                        <div className={classes.radio}>
+                            <Radio value="cplex" label="CPLEX" classNames={{ label: classes.radioLabel }} />
+                        </div>
                     </Group>
                 </Radio.Group>
             </div>

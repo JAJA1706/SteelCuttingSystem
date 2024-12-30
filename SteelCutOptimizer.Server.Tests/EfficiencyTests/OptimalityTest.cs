@@ -16,7 +16,6 @@ namespace EfficiencyTests
             const int TEST_ITERATIONS = 1; //18
             const int BATCH_ITERATIONS = 1; //3
 
-            List<CSVColumn> CSVColumns = new List<CSVColumn>();
             CSVColumn simpleTimeCol = new CSVColumn { columnName = "simple_time" };
             CSVColumn simpleValCol = new CSVColumn { columnName = "simple_val" };
             CSVColumn manual5TimeCol = new CSVColumn { columnName = "manual5_time" };
@@ -34,7 +33,7 @@ namespace EfficiencyTests
                 TestResult averagedManual5Results = new TestResult();
                 TestResult averagedManual10Results = new TestResult();
                 TestResult averagedAutoResults = new TestResult();
-                int optimalValAveraged = 0;
+                double optimalValAveraged = 0;
                 int problemSize = 0;
                 int stockCount = 0;
                 for (int j = 1; j <= BATCH_ITERATIONS; ++j)
@@ -70,7 +69,7 @@ namespace EfficiencyTests
                     averagedManual10Results.ObtainedValue += manual10TestResults.ObtainedValue / BATCH_ITERATIONS;
                     averagedAutoResults.Time += autoTestResults.Time / BATCH_ITERATIONS;
                     averagedAutoResults.ObtainedValue += autoTestResults.ObtainedValue / BATCH_ITERATIONS;
-                    optimalValAveraged += (int)optimalResultData.TotalCost! / BATCH_ITERATIONS;
+                    optimalValAveraged += (double)optimalResultData.TotalCost! / BATCH_ITERATIONS;
                     problemSize = problemData.OrderList!.Count;
                 }
 

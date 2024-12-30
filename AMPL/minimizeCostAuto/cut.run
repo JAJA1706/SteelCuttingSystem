@@ -68,6 +68,8 @@ repeat
 					let relaxCost[x] := minRelaxCost + 0.00001;
 				}
 			}
+			
+			let relaxCost[x] := relaxCost[x] * relaxCostMultiplier;
 		};
 		let rawBarLength := stockLengths[i];
 		solve Relaxed_Pattern_Gen;

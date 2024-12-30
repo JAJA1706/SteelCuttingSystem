@@ -37,6 +37,7 @@ for {i in STOCK}
 param isFeasible;
 let isFeasible := 1;
 param isNewPattern;
+param minRelaxCost;
 repeat
 {
 	solve Cutting_Opt;
@@ -45,6 +46,15 @@ repeat
 	let isNewPattern := 0;
 	for{i in STOCK}
 	{
+		for {x in ORDERS}
+		{
+			let minRelaxCost := price[x] / orderLengths[x];
+			let relaxCost[x] := (minRelaxCost - 0.00001) * relaxCostMultiplier;
+			if relaxCost[x] < 0 then
+			{
+				let relaxCost[x] := 0; 
+			}
+		}
 		let stockLength := stockLengths[i];
 		solve Pattern_Gen;
 		if ReducedCost - StockLimit[i] < -0.1 then

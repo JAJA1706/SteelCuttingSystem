@@ -55,6 +55,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
             fileContent.AppendLine();
             prepareStockSet(fileContent, data);
             fileContent.AppendLine();
+            prepareAdditionalDataManual(fileContent, data);
             prepareAdditionalDataAuto(fileContent, data);
             prepareAdditionalDataSingleStep(fileContent, data);
 
@@ -125,21 +126,10 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
             }
             else if (settings.MainObjective == "waste")
             {
-                if (isFastVersionSuitable(data))
+                fileContent.AppendLine("param: STOCK: stockLengths stockNum :=");
+                foreach (var stock in data.StockList)
                 {
-                    fileContent.AppendLine("param: STOCK: stockLengths :=");
-                    foreach (var stock in data.StockList)
-                    {
-                        fileContent.AppendLine($"{data.StockList.IndexOf(stock) + 1}  {stock.Length}");
-                    }
-                }
-                else
-                {
-                    fileContent.AppendLine("param: STOCK: stockLengths stockNum :=");
-                    foreach (var stock in data.StockList)
-                    {
-                        fileContent.AppendLine($"{data.StockList.IndexOf(stock) + 1}  {stock.Length}  {stock.Count}");
-                    }
+                    fileContent.AppendLine($"{data.StockList.IndexOf(stock) + 1}  {stock.Length}  {stock.Count}");
                 }
             }
             else
@@ -149,12 +139,26 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
             fileContent.AppendLine(";");
         }
 
+        private void prepareAdditionalDataManual(StringBuilder fileContent, CuttingStockProblemDataDTO data)
+        {
+            if (settings.RelaxationType != "manual" && settings.RelaxationType != "manualFast")
+                return;
+
+            if (data.RelaxCostMultiplier != null)
+            {
+                fileContent.AppendLine($"param relaxCostMultiplier := {data.RelaxCostMultiplier.ToString()!.Replace(',', '.')};");
+            }
+        }
 
         private void prepareAdditionalDataAuto(StringBuilder fileContent, CuttingStockProblemDataDTO data)
         {
             if (settings.RelaxationType != "auto")
                 return;
 
+            if (data.RelaxCostMultiplier != null)
+            {
+                fileContent.AppendLine($"param relaxCostMultiplier := {data!.RelaxCostMultiplier.ToString()!.Replace(',', '.')};");
+            }
             if (data.AreBasicPatternsAllowed != null)
             {
                 fileContent.AppendLine($"param allowBasicPatterns := {convertBoolToInt(data.AreBasicPatternsAllowed)};");
@@ -244,15 +248,6 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                 fileContent.Replace(",", ";", fileContent.Length - 2, 1);
                 fileContent.AppendLine();
             }
-        }
-
-        private bool isFastVersionSuitable(CuttingStockProblemDataDTO data)
-        {
-            if (settings.RelaxationType != "manualFast" ||
-                data.StockList!.Any(o => o.Count != int.MaxValue))
-                return false;
-
-            return true;
         }
 
         public void DisposeDataFile()

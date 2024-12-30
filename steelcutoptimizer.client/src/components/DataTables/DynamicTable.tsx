@@ -77,7 +77,7 @@ const DynamicTable = <T extends BaseData>({
             rowsPerPage: ""
         },
         renderBottomToolbarCustomActions: () => (
-            <>
+            <div className={classes.customBottomToolbar}>
                 <Button
                     onClick={() => {
                         setData((oldData) => [
@@ -93,7 +93,7 @@ const DynamicTable = <T extends BaseData>({
                         <IconTrash />
                     </ActionIcon>
                 </Tooltip>
-            </>
+            </div>
         ),
         state: {
             isLoading: false,

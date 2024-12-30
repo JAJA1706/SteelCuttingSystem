@@ -11,6 +11,7 @@
         {
             MainObjective = copyObj.MainObjective;
             RelaxationType = copyObj.RelaxationType;
+            Solver = copyObj.Solver;
         }
     }
 }

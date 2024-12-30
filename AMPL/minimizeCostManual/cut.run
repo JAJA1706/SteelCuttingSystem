@@ -39,12 +39,22 @@ let isFeasible := 1;
 param isNewPattern;
 let isNewPattern := 0;
 param numericTolerance;
+param minRelaxCost;
 repeat
 {
 	solve Cutting_Opt;
 	let {x in ORDERS} price[x] := FillOrder[x].dual;
 	for {i in STOCK}
 	{
+		for {x in ORDERS}
+		{
+			let minRelaxCost := price[x] / orderLengths[x];
+			let relaxCost[x] := (minRelaxCost - 0.00001) * relaxCostMultiplier;
+			if relaxCost[x] < 0 then
+			{
+				let relaxCost[x] := 0; 
+			}
+		}
 		let rawBarLength := stockLengths[i];
 		let numericTolerance := stockCost[i]/10000;
 		solve Pattern_Gen;

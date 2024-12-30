@@ -1,3 +1,8 @@
 .rows {
     --table-vertical-spacing: 0px;
 }
+
+.customBottomToolbar{
+    display: flex;
+    align-items: center;
+}

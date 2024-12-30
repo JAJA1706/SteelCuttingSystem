@@ -6,7 +6,7 @@ import useOrderStore from "../../hooks/useOrderStore"
 import { useShallow } from 'zustand/react/shallow';
 import DynamicTable, { BaseData } from './DynamicTable';
 import { Settings } from '../SettingsPanel/SettingsPanel';
-import { Checkbox } from "@mantine/core";
+import { Checkbox, Title, Stack } from "@mantine/core";
 
 export interface Order extends BaseData {
     maxRelax: number | undefined;
@@ -126,7 +126,7 @@ const DynamicTableOrder = ({ dataRef, algorithmSettings }: DynamicTableOrderProp
                     }),
                 }];
 
-            if (algorithmSettings.relaxationType === "manual") {
+            if (algorithmSettings.relaxationType === "manual" || algorithmSettings.relaxationType === "manualFast") {
                 columnsDef.push({
                     accessorKey: 'maxRelax',
                     header: 'Max Relax',
@@ -193,14 +193,15 @@ const DynamicTableOrder = ({ dataRef, algorithmSettings }: DynamicTableOrderProp
     } 
 
     return (
-        <div>
+        <Stack align="center" gap="3px">
+            <Title size="h4">Order Table</Title>
             <DynamicTable<Order>
                 data={data}
                 setData={setData}
                 columns={columns}
                 getDefaultNewRow={getDefaultNewRow}
             />
-        </div>
+        </Stack>
     );
 };
 

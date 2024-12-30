@@ -30,13 +30,14 @@ export interface AmplResults {
     stockLimits: number[];
 }
 export interface CuttingStockProblemBody {
-    algorithmSettings: Settings,
-    stockList: Stock[],
-    orderList: Order[],
-    areBasicPatternsAllowed?: boolean | undefined,
+    algorithmSettings: Settings;
+    stockList: Stock[];
+    orderList: Order[];
+    areBasicPatternsAllowed?: boolean | undefined;
     patterns?: Pattern[];
     orderPrices?: number[];
     stockLimits?: number[];
+    relaxCostMultiplier?: number;
 }
 
 const postCuttingStockProblem = (body: CuttingStockProblemBody): Promise<AmplResults>  => {

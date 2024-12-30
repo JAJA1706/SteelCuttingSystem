@@ -29,16 +29,19 @@ subj to StockLimit {i in STOCK}:
 # ----------------------------------------
 # KNAPSACK SUBPROBLEM
 # ----------------------------------------
-param relaxCost default 0.01;
+param relaxCost {ORDERS} default 0.01;
 param price {ORDERS} default 0.0;
 param stockLength default 0;
 var Use {ORDERS} integer >= 0;
 var Relax {ORDERS} integer >= 0;
 	
 minimize ReducedCost:
-   stockLength - sum{x in ORDERS}(orderLengths[x] * Use[x] - Relax[x] + price[x]*Use[x] - Relax[x]*relaxCost);
+   stockLength - sum{x in ORDERS}(orderLengths[x] * Use[x] - Relax[x] + price[x]*Use[x] - Relax[x]*relaxCost[x]);
 subj to LengthLimit:
    sum {x in ORDERS} (orderLengths[x] * Use[x] - Relax[x]) <= stockLength;
 subj to MaxRelax {x in ORDERS}:
 	Relax[x] <= maxRelax[x] * Use[x];
 	
+	
+#additional params for cut.run
+param relaxCostMultiplier default 1;

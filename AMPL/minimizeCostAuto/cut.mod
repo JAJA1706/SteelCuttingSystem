@@ -48,3 +48,4 @@ subj to IsRelaxationAllowed {x in ORDERS}:
 
 #additional params for cut.run
 param allowBasicPatterns default 0;
+param relaxCostMultiplier default 1;
