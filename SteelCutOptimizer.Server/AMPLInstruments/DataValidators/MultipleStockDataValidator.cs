@@ -10,6 +10,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
             if(entryData.OrderList == null || entryData.StockList == null)
                 throw new InvalidDataException("Stock list nor Order list cannot be null");
 
+            //orderLengthSum < stockLengthSum
             long orderLengthSum = entryData.OrderList.Aggregate((long)0, (sum, next) => sum += next.Length * next.Count);
 
             long stockLengthSum;
@@ -21,6 +22,15 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
 
             if(orderLengthSum > stockLengthSum)
                 throw new InvalidDataException("infeasible problem, sum of order lengths is higher than sum of stock lengths");
+
+            //maxOrderLength < maxStockLength
+            if(unlimitedStock == null)
+            {
+                int maxOrderLength = entryData.OrderList.Max(x => x.Length);
+                int maxStockLength = entryData.StockList.Max(y => y.Length);
+                if (maxOrderLength > stockLengthSum)
+                    throw new InvalidDataException("infeasible problem, max order length is higher than max stock length.");
+            }
 
             return ;
         }
@@ -48,6 +58,17 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                 if (usedStockLengths.TryGetValue(stock.Length, out int usedStockCount))
                 {
                     if (stock.Count < usedStockCount)
+                        throw new InvalidDataException("infeasible problem");
+                }
+            }
+
+            //Check if virtual stock items has been used
+            if (entryData.StockList!.Any(x => x.Cost == int.MaxValue))
+            {
+                var virtualStockId = entryData.StockList!.Count() - 1; //virtual is added as last so it will be placed on the end.
+                foreach (var pattern in amplResult.Patterns.Values)
+                {
+                    if (pattern.StockId == virtualStockId && pattern.UseCount > 0)
                         throw new InvalidDataException("infeasible problem");
                 }
             }

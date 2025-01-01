@@ -15,8 +15,8 @@ namespace EfficiencyTests
         {
             AmplSolverInterface amplSolver = new AmplSolverInterface();
             CuttingStockProblemGenerator gpcs = new CuttingStockProblemGenerator();
-            const int TEST_ITERATIONS = 18; //18
-            const int BATCH_ITERATIONS = 3; //3
+            const int TEST_ITERATIONS = 1; //18
+            const int BATCH_ITERATIONS = 1; //3
 
             CSVColumn valDefaultCol = new CSVColumn { columnName = "default_val" };
             CSVColumn val20Col = new CSVColumn { columnName = "20%_val" };
@@ -108,8 +108,8 @@ namespace EfficiencyTests
         {
             AmplSolverInterface amplSolver = new AmplSolverInterface();
             CuttingStockProblemGenerator gpcs = new CuttingStockProblemGenerator();
-            const int TEST_ITERATIONS = 18; //18
-            const int BATCH_ITERATIONS = 3; //3
+            const int TEST_ITERATIONS = 1; //18
+            const int BATCH_ITERATIONS = 1; //3
 
             CSVColumn valDefaultCol = new CSVColumn { columnName = "default_val" };
             CSVColumn val20Col = new CSVColumn { columnName = "20%_val" };

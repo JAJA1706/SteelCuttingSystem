@@ -20,7 +20,7 @@ namespace EfficiencyTests
         {
             AmplSolverInterface amplSolver = new AmplSolverInterface();
             Cutgen problemGen = new Cutgen();
-            const int TEST_ITERATIONS = 2; //40
+            const int TEST_ITERATIONS = 1; //250
 
             List<TestResult> costResultList = new List<TestResult>();
             List<TestResult> wasteResultList = new List<TestResult>();

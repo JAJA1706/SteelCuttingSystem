@@ -2,6 +2,7 @@
 using System.Text;
 using SteelCutOptimizer.Server.Structs;
 using System.Data;
+using System.Linq;
 
 namespace SteelCutOptimizer.Server.AMPLInstruments
 {
@@ -39,6 +40,75 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                     order.MaxRelax = 0;
                 if (order.CanBeRelaxed == null)
                     order.CanBeRelaxed = false;
+            }
+
+            addVirtualBasicPatternIfRequired(data);
+        }
+
+        private void addVirtualBasicPatternIfRequired(CuttingStockProblemDataDTO data)
+        {
+            if (data.AlgorithmSettings.MainObjective != "cost")
+                return;
+
+            bool isStockUnlimited = data.StockList!.Exists(x => x.Count == null);
+            if (isStockUnlimited)
+                return;
+
+            //descending sort
+            data.OrderList!.Sort((x, y) => x.Length > y.Length ? -1 : 1);
+            data.StockList!.Sort((x, y) => x.Length > y.Length ? -1 : 1);
+
+            Dictionary<int, int> remainingStockItems = new Dictionary<int, int>();
+            for (int i = 0; i < data.StockList.Count; ++i)
+            {
+                remainingStockItems[i] = (int)data.StockList[i].Count!;
+            }
+
+            bool isVirtualPatternRequired = false;
+            for (int i = 0; i < data.OrderList.Count && !isVirtualPatternRequired; ++i)
+            {
+                int remainingOrder = data.OrderList[i].Count;
+                foreach (var stockIdx in remainingStockItems.Keys)
+                {
+                    if (remainingOrder == 0)
+                        break;
+
+                    if (remainingStockItems[stockIdx] == 0)
+                        continue;
+
+                    var orderFitCount = Math.Floor((double)data.StockList[stockIdx].Length / data.OrderList[i].Length);
+                    if (orderFitCount == 0)
+                        continue;
+
+                    var requiredStockItems = (int)Math.Ceiling(remainingOrder / orderFitCount);
+                    if(requiredStockItems <= remainingStockItems[stockIdx])
+                    {
+                        remainingStockItems[stockIdx] -= requiredStockItems;
+                        remainingOrder = 0;
+                    }
+                    else
+                    {
+                        remainingOrder -= remainingStockItems[stockIdx] * (int)orderFitCount;
+                        remainingStockItems[stockIdx] = 0;
+                    }
+                }
+
+                if (remainingOrder != 0)
+                {
+                    isVirtualPatternRequired = true;
+                }
+            }
+
+            if(isVirtualPatternRequired)
+            {
+                int maxOrderLength = data.OrderList.Max(x => x.Length);
+                StockItem virtualItem = new StockItem
+                {
+                    Length = maxOrderLength,
+                    Count = int.MaxValue,
+                    Cost = int.MaxValue,
+                };
+                data.StockList.Add(virtualItem);
             }
         }
 
@@ -80,7 +150,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                 fileContent.AppendLine("param: ORDERS: orderLengths  orderNum  maxRelax :=");
                 foreach (var order in data.OrderList)
                 {
-                    fileContent.AppendLine($"{data.OrderList.IndexOf(order) + 1}  {order.Length}  {order.Count}  {order.MaxRelax}");
+                    fileContent.AppendLine($"{data.OrderList.IndexOf(order)}  {order.Length}  {order.Count}  {order.MaxRelax}");
                 }
             }
             else if (settings.RelaxationType == "auto" || settings.RelaxationType == "singleStep")
@@ -88,7 +158,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                 fileContent.AppendLine("param: ORDERS: orderLengths  orderNum  canBeRelaxed :=");
                 foreach (var order in data.OrderList)
                 {
-                    fileContent.AppendLine($"{data.OrderList.IndexOf(order) + 1}  {order.Length}  {order.Count}  {convertBoolToInt(order.CanBeRelaxed)}");
+                    fileContent.AppendLine($"{data.OrderList.IndexOf(order)}  {order.Length}  {order.Count}  {convertBoolToInt(order.CanBeRelaxed)}");
                 }
             }
             else if (settings.RelaxationType == "none")
@@ -96,7 +166,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                 fileContent.AppendLine("param: ORDERS: orderLengths  orderNum :=");
                 foreach (var order in data.OrderList)
                 {
-                    fileContent.AppendLine($"{data.OrderList.IndexOf(order) + 1}  {order.Length}  {order.Count}");
+                    fileContent.AppendLine($"{data.OrderList.IndexOf(order)}  {order.Length}  {order.Count}");
                 }
             }
             else
@@ -121,7 +191,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                 fileContent.AppendLine("param: STOCK: stockLengths stockNum stockCost :=");
                 foreach (var stock in data.StockList)
                 {
-                    fileContent.AppendLine($"{data.StockList.IndexOf(stock) + 1}  {stock.Length}  {stock.Count}  {stock.Cost}");
+                    fileContent.AppendLine($"{data.StockList.IndexOf(stock)}  {stock.Length}  {stock.Count}  {stock.Cost}");
                 }
             }
             else if (settings.MainObjective == "waste")
@@ -129,7 +199,7 @@ namespace SteelCutOptimizer.Server.AMPLInstruments
                 fileContent.AppendLine("param: STOCK: stockLengths stockNum :=");
                 foreach (var stock in data.StockList)
                 {
-                    fileContent.AppendLine($"{data.StockList.IndexOf(stock) + 1}  {stock.Length}  {stock.Count}");
+                    fileContent.AppendLine($"{data.StockList.IndexOf(stock)}  {stock.Length}  {stock.Count}");
                 }
             }
             else
